@@ -1,5 +1,5 @@
 <p align="center"> 
-<img src="https://github.com/bookworm6914/tech_book_notes/blob/main/Advanced-Python-Tips-A-Simple-Book-on-Advanced-Python-concepts-2020.PNG">
+<img src="Advanced-Python-Tips-A-Simple-Book-on-Advanced-Python-concepts-2020.PNG">
 </p>
 
 # Advanced Python Tips - A Simple Book on Advanced Python concepts
