@@ -7,8 +7,10 @@
 - [**Amazon URL**](https://www.amazon.com/Cracking-Code-Engineering-Software-Protections/dp/B0F1F7HL76/)
 - [**Original Book Notes**](Cracking-the-Code-Reverse-Engineering-Software-Protections_The-Ultimate-Reverse-Engineering-Guide-From-Beginner-to-Expert_2025_original_notes.txt)
 
+## Table of Contents
 
-# Chapter 1: Introduction to Software Protections
+
+# Chapter 1: Introduction to Software Protections   [top](#table-of-contents)
 
 ### Software protections aren’t just about keeping things safe — they’re about keeping things profitable. Here’s the breakdown:
 - Money (a.k.a. "Please Pay for Our Hard Work")
