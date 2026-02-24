@@ -5,7 +5,7 @@
 # Python Distilled (Developers Library)
 ## Published by Addison-Wesley, 2021 
 - [**Amazon URL**](https://www.amazon.com/Python-Essential-Reference-Developers-Library/dp/0134173279/)
-- [**Original Book Notes**](Addison-Wesley Python Distilled_Developers Library_2021_original_notes.txt)
+- [**Original Book Notes**](https://github.com/bookworm6914/tech_book_notes/blob/main/Addison-Wesley Python Distilled_Developers Library_2021_original_notes.txt)
 
 
 ## page73
