@@ -1,10 +1,11 @@
 <p align="center"> 
-<img src="https://github.com/bookworm6914/tech_book_notes/blob/main/Advanced Python Tips - A Simple Book on Advanced Python concepts 2020.PNG">
+<img src="https://github.com/bookworm6914/tech_book_notes/blob/main/Advanced-Python-Tips-A-Simple-Book-on-Advanced-Python-concepts-2020.PNG">
 </p>
 
 # Advanced Python Tips - A Simple Book on Advanced Python concepts
 ## Written by Rahul Agarwal, independently published, 2019
-[**Amazon URL**](https://www.amazon.com/Advanced-Python-Tips-explained-Simply/dp/1077001339/)
+- [**Amazon URL**](https://www.amazon.com/Advanced-Python-Tips-explained-Simply/dp/1077001339/)
+- [**Original Books Notes**](Advanced-Python-Tips-A-Simple-Book-on-Advanced-Python-concepts-2020_original_notes.txt)
 
 ### page8
 ** This book is about efficient and readable code. **
