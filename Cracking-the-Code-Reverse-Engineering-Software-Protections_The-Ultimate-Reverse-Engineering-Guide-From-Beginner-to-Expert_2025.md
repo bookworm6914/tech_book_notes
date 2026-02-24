@@ -1,5 +1,5 @@
 <p align="center"> 
-<img src="Cracking-the-Code-Reverse-Engineering-Software-Protections-2025.PNG">
+<img src="Cracking-the-Code-Reverse-Engineering-Software-Protections-2025.png">
 </p>
 
 # Python Distilled (Developers Library)
