@@ -4,6 +4,8 @@
 
 #### This repository hosts the briefs and notes that I wrote down from the IT related books that I've studied, so it will be easier for you and me to review later on.
 
+## Table of Contents
+
 - [Books on Python](#python-book-notes)
 - [Books on Security](#security-book-notes)
 
