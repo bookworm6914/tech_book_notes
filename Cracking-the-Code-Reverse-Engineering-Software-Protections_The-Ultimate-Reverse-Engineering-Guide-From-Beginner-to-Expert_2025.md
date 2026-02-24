@@ -39,6 +39,8 @@ The Unwritten Rule of Software Protections - **No software protection is truly u
 🔴 Frida   – Best for dynamic analysis, code injection, and attacking mobile apps.
 
 ## Setting Up a Safe Testing Environment:
+### [top](#table-of-contents)
+
 ### Step 1: Virtual Machines – Your Digital Sandbox
 ✅  VMware Workstation/Player – Fast, flexible, and ideal for Windows-based analysis.
 
@@ -145,6 +147,8 @@ Reverse engineering isn’t just about knowing what tools to use—it’s about 
 ### [top](#table-of-contents)
 
 ## 2.1 Common Software Licensing Methods:
+### [top](#table-of-contents)
+
 ### 1. Serial Keys – The Classic “Unlock Code”
 Also known as: The Old Reliable
 
@@ -266,6 +270,7 @@ Also known as: “You want that feature? Fork over the cash.”
 ✅ Analyzing the program’s startup logic for activation routines
 
 ## 2.2 Online vs. Offline Activation
+### [top](#table-of-contents)
 
 ### Online Activation – “You Shall Not Pass... Without Internet”
 
@@ -340,6 +345,7 @@ Also known as: “You want that feature? Fork over the cash.”
 *_Hybrid Activation Systems – The “Best of Both Worlds” (or Worst, Depending on Your Perspective)_*
 
 ## 2.3 License Key Algorithms and Validation Mechanisms
+### [top](#table-of-contents)
 
 **Common License Key Algorithms**
 ### 1. Simple Pattern-Based Keys
@@ -444,6 +450,7 @@ The key is usually a hash of these values combined with a secret key.
     - ● Modify the response to trick the software into thinking activation succeeded.
 
 ## 2.4 Detecting and Analyzing License Checks
+### [top](#table-of-contents)
 
 **Where License Checks Hide in Software：**
 
@@ -505,6 +512,7 @@ The key is usually a hash of these values combined with a secret key.
   - ● Redirect the software’s network traffic to your local emulator .
 
 ## 2.5 Cracking License Checks and Key Validation
+### [top](#table-of-contents)
 
 - Step 1: Locating the License Check in the Code
 - Step 2: Patching the License Check
@@ -600,6 +608,7 @@ debugged.
 
 
 ## 3.2 Anti-Disassembly Techniques (Opaque Predicates, Junk Code)
+### [top](#table-of-contents)
 
 Disassemblers like IDA Pro, Ghidra, and Radare2 are powerful tools, but they rely on predictable patterns in assembly code.
 Software protections take advantage of this by introducing irregularities that break automatic analysis. The goal? To make disassembly either:
@@ -676,6 +685,7 @@ To a disassembler, this might look like important logic, but in reality, it’s 
 
 
 ## 3.3 Anti-Virtual Machine and Sandboxing Detection
+### [top](#table-of-contents)
 
 Normal users don’t typically run everyday applications inside virtual machines and sandboxes, while reverse engineers, malware analysts, and cybersecurity professionals do.
 
@@ -777,6 +787,8 @@ session.create_script(script).load()
 
 
 ## 3.4 Code Obfuscation Methods
+### [top](#table-of-contents)
+
 Developers use obfuscation techniques for several reasons, including:
 
 ● Preventing Reverse Engineering – Makes it harder for attackers to understand and modify the code.
@@ -863,6 +875,7 @@ If you ever get lost in a mess of obfuscated code, remember:
 
 
 ## 3.5 Identifying and Defeating Anti-Reversing Mechanisms
+### [top](#table-of-contents)
 
 **What Are Anti-Reversing Mechanisms?**
 
