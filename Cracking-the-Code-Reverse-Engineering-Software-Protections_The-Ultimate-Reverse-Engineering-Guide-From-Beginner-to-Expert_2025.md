@@ -15,6 +15,7 @@
 - [Chapter 5: Analyzing and Defeating Packing Techniques](#chapter-5-analyzing-and-defeating-packing-techniques)
 - [Chapter 6: Cracking Serial Key and Keygen Algorithms](#chapter-6-cracking-serial-key-and-keygen-algorithms)
 - [Chapter 7: Defeating Code Obfuscation and Encryption](#chapter-7-defeating-code-obfuscation-and-encryption)
+- [Chapter 8: Bypassing Online Protections and Network Licensing](#chapter-8-bypassing-online-protections-and-network-licensing)
 
 # Chapter 1: Introduction to Software Protections
 ### [top](#table-of-contents)
@@ -2364,8 +2365,251 @@ Let’s say we’re analyzing a program that communicates with a remote server, 
   - ● `Binary Ninja` – Another great decompiler with built-in automation tools.
 
 
+# Chapter 8: Bypassing Online Protections and Network Licensing
+### [top](#table-of-contents)
+
+## 8.1 How Online Activations Work
+
+### 1. Why Online Activation Exists
+Online activation is introduced to prevent:
+- ● Key Sharing – No more one-key-for-everyone loophole.
+- ● Piracy – Makes it harder (but not impossible) to use cracked versions.
+- ● Multiple Installations – Enforces per-device licensing.
+- ● Unauthorized Reselling – Prevents people selling stolen or duplicate keys.
+
+### 2. The Online Activation Process
+- 🔹 Step 1: User Enters a License Key
+- 🔹 Step 2: The Software Contacts the License Server
+  - The request typically includes:
+    - ✅ Your License Key – The key you entered.
+    - ✅ Hardware ID (HWID) – A unique fingerprint of your system.
+    - ✅ User Data – Sometimes tied to your account.
+    - ✅ Timestamp – To check if the key is expired.
+- 🔹 Step 3: Server Validation
+  - The activation server checks if the license key is:
+    - ✅ Valid – Matches a real, purchased key.
+    - ✅ Unused or Within Allowed Limits – Not already activated on too many devices.
+    - ✅ Not Blacklisted – Some keys get banned due to abuse or piracy.
+- 🔹 Step 4: Activation Response
+
+### 3. Different Types of Online Activation Systems
+- 🔹 One-Time Activation
+  - Once activated, you’re good to go — no internet required afterward. 
+  - Example: `Microsoft Office 2016`
+- 🔹 Periodic Online Checks
+  - The software phones home every few days or weeks to verify the license.
+  - Example: `Adobe Creative Cloud`
+- 🔹 Subscription-Based Activation
+  - You pay a monthly fee, and the software remains active as long as you keep paying.
+  - Example: `Netflix`, `Microsoft 365`
+- 🔹 Cloud-Based Licensing
+  - No local activation. All licensing is handled through a cloud server.
+  - Example: SaaS applications like `Autodesk` or `MATLAB`
+
+### 4. How Online Activation Can Be Bypassed (For Research Purposes, Of Course 😉)
+Some common techniques:
+- 🔹 Network Interception
+
+Using tools like `Wireshark` or `Burp Suite`, researchers can capture the activation request to see what data is being sent.
+
+This can help in analyzing how the activation process works.
+- 🔹 API Call Tampering
+
+Some reverse engineers use tools like Frida to intercept and modify the response from the server, tricking the software into thinking the activation was successful.
+- 🔹 Local License Token Patching
+
+If the activation token is stored locally, modifying or copying it can bypass checks. This is why modern protections use encrypted tokens.
+- 🔹 Emulating the License Server
+
+By running a fake activation server on a local machine, the software can be tricked into verifying a bogus license key.
+
+This is called server-side license spoofing.
+
+### 5. The Cat-and-Mouse Game Between Hackers and Developers
+Companies try to fight back with:
+- ✅ Hardware-Based Licensing (Dongles, TPM Chips) – Harder to bypass.
+- ✅ Frequent Online Verification – Prevents offline key tampering.
+- ✅ Encrypted License Keys & Tokens – Makes reverse engineering tougher.
+- ✅ AI-Based Fraud Detection – Identifies suspicious activation patterns.
 
 
+## 8.2 Analyzing Network Requests for Authentication
+### [top](#table-of-contents)
+
+### 1. How Authentication Requests Work
+- ● User enters a license key into the software.
+- ● Software generates an authentication request with system details.
+- ● Request is sent to the server over the internet.
+- ● Server verifies the request and responds with either a success or failure message.
+- ● Software either activates successfully or denies access.
+
+### 2. Tools for Capturing Network Traffic
+-🔹 Wireshark (The Swiss Army Knife of Network Sniffing)
+-🔹 Burp Suite (For Web-Based Licenses & API Calls)
+-🔹 Fiddler (Man-in-the-Middle Debugging)
+-🔹 Frida (Dynamic Hooking for Advanced Analysis)
+-🔹 MitMproxy (Intercept and Modify on the Fly)
+
+### 3. Capturing and Analyzing Authentication Traffic
+-🔹 Step 1: Identify the Target Software
+-🔹 Step 2: Set Up Your Sniffing Environment
+  - ● Install Wireshark or Burp Suite and configure them to capture network traffic.
+  - ● Set up SSL interception (if necessary) to decrypt HTTPS traffic.
+  - ● Use a virtual machine if you want to test without affecting your main system.
+- 🔹 Step 3: Capture the Activation Request
+  - ● Start your sniffer (Wireshark, Burp, etc.).
+  - ● Enter the license key in the software.
+  - ● Capture the outgoing request the software makes.
+  - ● Look for patterns like POST requests to an activation server .
+-🔹 Step 4: Analyze the Response
+-🔹 Step 5: Replay and Modify Requests
+
+### 4. Bypassing Authentication Mechanisms (Ethical Research Only 😉)
+- 🔹 Method 1: Modifying License Requests
+  - By changing request parameters (e.g. replacing invalid_key with valid_key), some poorly protected software might grant access.
+- 🔹 Method 2: Local License Token Forgery
+  - If the activation token is stored locally, attackers can replace it with a valid token from another system.
+- 🔹 Method 3: Fake Activation Servers
+  - By redirecting the software’s request to a custom server, an attacker can send back an "activation successful" response.
+- 🔹 Method 4: Man-in-the-Middle Attack
+  - Intercepting and modifying activation responses in real time using Burp Suite or mitmproxy.
+- 🔹 Method 5: API Abuse
+  - Some software has debug endpoints that can be exploited for unauthorized activation.
+
+## 8.3 Intercepting and Modifying API Calls
+### [top](#table-of-contents)
+
+### 1. What Are API Calls and Why Do They Matter?
+
+### 2. Tools for Intercepting API Calls
+- 🔹 Burp Suite (The Web API Interceptor)
+  - ● Perfect for capturing HTTP/S-based API requests.
+  - ● Allows modifying requests in real time.
+  - ● Can replay, automate, and brute-force API requests.
+- 🔹 mitmproxy (Man-in-the-Middle Proxy)
+  - ● Works similarly to Burp Suite but is command-line-based.
+  - ● Excellent for modifying API responses dynamically.
+  - ● Can be used for SSL/TLS decryption.
+- 🔹 Frida (The Dynamic Code Hooker)
+  - ● Hooks into applications at runtime.
+  - ● Can intercept and modify API calls before they even reach the server .
+  - ● Works on desktop, mobile, and embedded devices.
+- 🔹 Wireshark (The Network Sniffer)
+  - ● Great for analyzing API traffic but not modifying it.
+  - ● Useful for spotting unsecured data transmissions.
+
+### 3. Capturing API Requests in Action
+- 🔹 Step 1: Set Up Burp Suite as a Proxy
+  - ● Install Burp Suite and configure it to intercept traffic.
+  - ● Set your browser or software’s proxy to localhost:8080.
+  - ● Enable SSL/TLS interception to capture encrypted traffic.
+- 🔹 Step 2: Capture the License Validation Request
+  - ● Start the target software.
+  - ● Enter a test license key and hit Activate.
+  - ● Burp Suite will capture the outgoing request before it reaches the server .
+- 🔹 Step 3: Modify the API Request or Response
+
+### 4. API Hooking with Frida: A More Advanced Approach
+- 🔹 Hooking an API Call in Frida
+Example internal API in a mobile app:
+```
+bool checkPremiumAccess() {
+    return callServerForActivation();
+}
+```
+Example Frida script:
+```
+Interceptor .attach(Module.findExportByName(null, "checkPremiumAccess"), {
+    onEnter: function(args) {
+        console.log("Intercepted API Call!");
+    },
+    onLeave: function(retval) {
+        retval.replace(1);  // Forces the function to return "true"
+    }
+});
+```
+
+## 8.4 Patching Online Checks and Redirecting Traffic
+### [top](#table-of-contents)
+
+### 1. How Online Checks Work
+- ● Software starts → Sends a request to the license server.
+- ● Server responds → Confirms whether the license is valid or expired.
+- ● Software acts accordingly → Grants full access if valid, limits functionality if invalid.
+
+### 2. Methods for Bypassing Online License Checks
+There are three primary ways to defeat online license verification:
+- ● Patching the software to remove the call to the license server .
+- ● Redirecting traffic so that the software talks to a fake local server instead of the real one.
+- ● Modifying network responses to return “valid” even when they aren’t.
+
+### 3. Patching Online Checks in the Executable
+- 🔹 Identifying the License Check Function
+- 🔹 NOPing Out the Call
+  - ● Replace it with NOP (no operation) instructions.
+  - ● Redirect it to a function that always returns “success.”
+
+### 4. Redirecting Traffic to a Local Server
+- 🔹 Editing the Hosts File (Quick and Dirty)
+  - ● Windows: C:\Windows\System32\drivers\etc\hosts
+  - ● Linux/Mac: /etc/hosts
+  - Add an entry like this:
+`127.0.0.1  license-check.example.com`
+
+- 🔹 Running a Fake Local Server
+  - Example Python script (using Flask):
+```
+from flask import Flask, jsonify
+
+app = Flask(__name__)
+
+@app.route('/api/validate_license', method
+def validate_license():
+    return jsonify({
+        "status": "valid",
+        "expires": "2099-12-31"
+    })
+
+if __name__ == '__main__':
+    app.run(host='127.0.0.1', port=80)
+```
+### 5. Modifying Network Responses with Burp Suite or mitmproxy
+- ● Open Burp Suite and enable Intercept Mode.
+- ● Capture the license validation request.
+
+**Conclusion: Online Checks Are Not Bulletproof**
 
 
+## 8.5 Reverse Engineering Web-Based Licensing Systems
+### [top](#table-of-contents)
+
+### 1. How Web-Based Licensing Works
+- ● Online Authentication on Launch - The software checks the license server every time it starts. 
+- ● Periodic License Validation - The software calls home every few days or weeks to verify its license.
+- ● Token-Based  Licensing - The software retrieves a temporary access token from the server, which expires after a certain time.
+- ● Cloud-Based Accounts - The software requires a user login, and the license is tied to that account rather than a traditional key.
+
+### 2. Intercepting and Analyzing License Requests
+- 🔹 Using Burp Suite or mitmproxy
+  - ● These tools allow us to intercept HTTPS requests, modify them, and observe the responses.
+  - ● By setting up a man-in-the-middle (MITM) proxy, we can analyze every request and response between the software and the licensing server.
+- 🔹 Examining the Software’s API Calls
+  - ● Some applications use cleartext API calls that are easy to read.
+  - ● Others may encrypt or obfuscate their communication — we’ll cover how to analyze those later.
+
+### 3. Modifying Server Responses
+Once we intercept a request, we can tamper with the response before it reaches the software.
+
+### 4. Bypassing Cloud-Based Licensing Systems
+- 🔹 Analyzing Authentication Requests
+  - ● First, capture the login request in Burp Suite or mitmproxy.
+  - ● Look for authentication tokens, which are often JWTs (JSON Web Tokens) or encrypted cookies.
+  - ● Modify or replace these tokens to mimic a premium account.
+
+### 5. Defeating Server-Side Encryption and Obfuscation
+- 🔹 Finding the Encryption Algorithm
+  - ● Use dynamic analysis tools (like x64dbg or Frida) to find where the software encrypts and decrypts the data.
+  - ● Look for common encryption algorithms like AES, RSA, or Base64.
+- 🔹 Hooking the Encryption Functions
+  - With Frida, we can hook encryption functions and capture decrypted data in real-time.
 
