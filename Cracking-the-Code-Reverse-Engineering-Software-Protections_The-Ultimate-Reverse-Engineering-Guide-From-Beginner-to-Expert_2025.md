@@ -17,6 +17,7 @@
 - [Chapter 7: Defeating Code Obfuscation and Encryption](#chapter-7-defeating-code-obfuscation-and-encryption)
 - [Chapter 8: Bypassing Online Protections and Network Licensing](#chapter-8-bypassing-online-protections-and-network-licensing)
 - [Chapter 9: Defeating Virtual Machines and Emulated Protections](#chapter-9-defeating-virtual-machines-and-emulated-protections)
+- [Chapter 10:  Advanced Software Cracking Techniques](#chapter-10-advanced-software-cracking-techniques)
 
 # Chapter 1: Introduction to Software Protections
 ### [top](#table-of-contents)
@@ -2938,10 +2939,499 @@ Interceptor .attach(Module.findExportByName(null, "CryptDecrypt"), {
 **✔ This will dump decrypted contents every time the function is called.**
 
 
+# Chapter 10:  Advanced Software Cracking Techniques
+### [top](#table-of-contents)
+
+## 10.1 Code Injection and Function Hooking
+
+### 1. What Is Code Injection and Why Do We Use It?
+- ✔ Modify the behavior of a running program without changing its original code
+- ✔ Add or remove functionality in real time
+- ✔ Intercept and manipulate data before it reaches the program
+- ✔ Evade security mechanisms that rely on static analysis
+
+This technique is widely used in:
+- ● Game cheating (modifying in-game values, ESP hacks, aimbots)
+- ● Malware development (yes, attackers love this trick too)
+- ● Security research (debugging, tracing, vulnerability exploitation)
+- ● Software customization (modifying closed-source software behavior)
+
+### 2. Code Injection Techniques
+
+#### 🔹 Method 1: DLL Injection
+One of the most common ways to inject code into a process is by injecting a Dynamic Link Library (DLL).
+- 📌 How It Works:
+  - ● The target application loads our malicious DLL.
+  - ● Our DLL executes code within the target process.
+  - ● We manipulate the application’s behavior from inside.
+- 📌 Tools for DLL Injection:
+  - ● `Process Hacker` (manual injection)
+  - ● `Extreme Injector` (GUI-based injector)
+  - ● C++ with Windows API (programmatic injection)
+
+‼️‼️‼️NOTE: this example does NOT when `ASLR` is turned on by default, from Windows XP SP3+ ‼️‼️‼️
+- 🔍 Example: Injecting a DLL into Notepad.exe
+```
+#include <windows.h>
+#include <tlhelp32.h>
+
+DWORD GetProcessID(const char* processName) {
+    PROCESSENTRY32 pe;
+    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    pe.dwSize = sizeof(PROCESSENTRY32);
+    if (Process32First(snapshot, &pe)) {
+        do {
+            if (!_stricmp(pe.szExeFile, processName)) {
+                CloseHandle(snapshot);
+                return pe.th32ProcessID;
+            }
+        } while (Process32Next(snapshot, &pe));
+    }
+    CloseHandle(snapshot);
+    return 0;
+}
+
+int main() {
+    DWORD pid = GetProcessID("notepad.exe");
+    if (pid == 0) {
+        printf("Target process not found.\n");
+        return -1;
+    }
+
+    HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
+    LPVOID pRemoteMemory = VirtualAllocEx(hProcess, NULL, MAX_PATH, MEM_COMMIT, PAGE_READWRITE);
+    WriteProcessMemory(hProcess, pRemoteMemory, "InjectedDLL.dll", strlen("InjectedDLL.dll") + 1, NULL);
+    CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)LoadLibraryA, pRemoteMemory, 0, NULL);
+    CloseHandle(hProcess);
+    return 0;
+}
+```
+#### 🔹 Method 2: Code Cave Injection
+A code cave  is an unused space within a program’s memory where we can insert our own instructions.
+This is useful when we don’t want to allocate new memory or modify the executable directly.
+- 📌 How It Works:
+  - ● Find a code cave in the target executable (usually a sequence of 0x90 NOPs).
+  - ● Write our custom instructions into that space.
+  - ● Redirect execution to our new code.
+- 🔍 Example: Finding a Code Cave with x64dbg
+  - ● Open the target binary in x64dbg.
+  - ● Search for NOP (0x90) sequences in the .text section.
+  - ● Modify binary to jump to the code cave, execute our payload, then return.
+
+### 3. Function Hooking: Hijacking Existing Code
+Code injection is cool, but function hooking is where things get truly powerful.
+Instead of injecting new code, we modify existing functions to intercept and manipulate execution flow.
+
+- 🔹 Method 1: Inline Hooking (Trampoline Hooking)
+  - This method replaces the first few bytes of a function with a jump to our custom function.
+
+  - 📌 Example: Hooking MessageBoxA in Windows
+```
+#include <windows.h>
+#include <iostream>
+
+typedef int (WINAPI* MessageBoxA_t)(HWND, LPCSTR, LPCSTR, UINT);
+MessageBoxA_t OriginalMessageBoxA;
+
+int HookedMessageBoxA(HWND hWnd, LPCSTR lpText, LPCSTR lpCaption, UINT uType) {
+    return OriginalMessageBoxA(hWnd, "Hooked!", lpCaption, uType);
+}
+
+void HookFunction() {
+    DWORD oldProtect;
+    BYTE* targetFunction = (BYTE*)GetProcAddress(GetModuleHandleA("user32.dll"), "MessageBoxA");
+    OriginalMessageBoxA = (MessageBoxA_t) targetFunction;
+    VirtualProtect(targetFunction, 5, PAGE_EXECUTE_READWRITE, &oldProtect);
+    targetFunction[0] = 0xE9; // JMP instruction
+    *(DWORD*)(targetFunction + 1) = (DWORD) ((BYTE*)HookedMessageBoxA - targetFunction - 5);
+    VirtualProtect(targetFunction, 5, oldProtect, &oldProtect);
+}
+
+int main() {
+    HookFunction();
+    MessageBoxA(NULL, "This is a test.", "Original", MB_OK);
+    return 0;
+}
+```
+✔ This hijacks Windows’ `MessageBoxA` function and changes the text.
+
+- 🔹 Method 2: API Hooking with Microsoft Detours
+  - Microsoft’s Detours library allows easy API hooking without modifying bytes manually.
+
+  - 🔍 Example: Hooking a Function with Detours
+```
+#include <windows.h>
+#include "detours.h"
+
+typedef BOOL (WINAPI* WriteFile_t)(HANDLE, LPCVOID, DWORD, LPDWORD, LPOVERLAPPED);
+WriteFile_t OriginalWriteFile;
+
+BOOL WINAPI HookedWriteFile(HANDLE hFile, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite, LPDWORD lpNumberOfBytesWritten, LPOVERLAPPED lpOverlapped) {
+    printf("Intercepted WriteFile call!\n");
+    return OriginalWriteFile(hFile, lpBuffer , nNumberOfBytesToWrite, lpNumberOfBytesWritten, lpOverlapped);
+}
+
+void InstallHook() {
+    OriginalWriteFile = (WriteFile_t)GetProcAddress(GetModuleHandleA("kernel32.dll"), "WriteFile");
+    DetourTransactionBegin();
+    DetourUpdateThread(GetCurrentThread());
+    DetourAttach(&(PVOID&)OriginalWriteFile, HookedWriteFile);
+    DetourTransactionCommit();
+}
+
+int main() {
+    InstallHook();
+    char buffer[] = "Test";
+    DWORD written;
+    WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), buffer, sizeof(buffer), &written, NULL);
+    return 0;
+}
+```
+✔ This hooks the `WriteFile` API and logs every file write operation.
 
 
+## 10.2 Runtime Patchers and Memory Editing
+### [top](#table-of-contents)
+
+### 1. What is Runtime Patching and Memory Editing?
+Runtime patching is the art of modifying a program while it’s running, instead of modifying the actual binary file on disk. This is done by:
+- ✅ Changing variables in memory
+- ✅ Overwriting instructions on-the-fly
+- ✅ Redirecting code execution
+- ✅ Hooking or intercepting function calls
+
+This technique is often used for:
+- ● Game hacking (modifying player health, money, or ammo)
+- ● Bypassing software restrictions (removing trial limitations, unlocking features)
+- ● Debugging and security research (identifying vulnerabilities in applications)
+- ● Malware analysis (patching out anti-analysis techniques in malicious code)
+
+### 2. Essential Tools for Memory Editing and Patching
+- 🔹 Cheat Engine – The Swiss Army knife of memory editing, mostly used for game hacking but great for general memory manipulation.
+- 🔹 x64dbg & OllyDbg – Powerful debuggers that let you inspect, modify, and patch instructions in memory.
+- 🔹 Process Hacker – A powerful task manager alternative that lets you inspect running processes, open memory sections, and even inject code.
+- 🔹 Frida – A dynamic instrumentation tool that lets you hook and modify function calls in real time (great for mobile and desktop apps).
+- 🔹 Python + PyMeow or PyCheat – If you prefer scripting your patches, Python libraries allow you to automate memory manipulation.
+
+### 3. Changing Memory Values in Real-Time
+- 🔹 Method 1: Using Cheat Engine for Memory Editing
+  - 📌 Steps to find and modify the value:
+    - ● Open Cheat Engine and attach it to the game process.
+    - ● Search for your current health value (100).
+    - ● Take damage in-game and search again for the new value.
+    - ● Repeat until only one address remains.
+    - ● Change the value to 9999 and freeze it. 🎮
+
+💡 Tip: Many games use floating point numbers or encrypted values, so you may need to search for different types of values.
+
+- 🔹 Method 2: Manual Memory Editing with x64dbg
+  - For more control, we can edit memory directly using a debugger.
+  - 📌 Example: Changing a game’s score variable manually
+    - ● Attach x64dbg to the process.
+    - ● Locate the memory section where the variable is stored (Data section).
+    - ● Find the instruction that writes to the score (e.g., mov [eax], 100).
+    - ● Modify it in memory to mov [eax], 9999.
+
+  - 🔍 Before (original instruction in assembly):
+```
+mov [eax], 100    ; Sets the score to 100
+```
+  - 🔄 After patching in memory:
+```
+mov [eax], 9999   ; Boom! Unlimited points!
+```
+This change lasts only while the program is running—restart the game, and it resets.
+
+### 4. Patching Code at Runtime
+- 🔹 Method 1: Bypassing Software Restrictions
+  - 📌 Example: Disabling a trial check at runtime
+    - ● Open x64dbg and attach it to the target software.
+    - ● Set a breakpoint on GetSystemTime or QueryPerformanceCounter (often used for trial checks).
+    - ● Step through the code and find where the software compares the current time to the trial expiration date.
+    - ● Modify the comparison instruction (CMP EAX, 1 → CMP EAX, 0).
+
+💡 Tip: You can also search for "Trial expired" in memory and backtrace where it’s being called.
+
+- 🔹 Method 2: Writing a Simple Runtime Patcher in C++
+  - 📌 Example: Patching a function in memory using C++
+```
+#include <windows.h>
+#include <iostream>
+
+void PatchMemory(BYTE* address, BYTE* newBytes, size_t size) {
+    DWORD oldProtect;
+    VirtualProtect(address, size, PAGE_EXECUTE_READWRITE, &oldProtect);
+    memcpy(address, newBytes, size);
+    VirtualProtect(address, size, oldProtect, &oldProtect);
+}
+
+int main() {
+    DWORD processID;
+    std::cout << "Enter target process ID: ";
+    std::cin >> processID;
+    HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processID);
+    if (!hProcess) {
+        std::cout << "Failed to open process.\n";
+        return 1;
+    }
+
+    BYTE patch[] = { 0x90, 0x90, 0x90, 0x90, 0x90 }; // NOP (No operation)
+    PatchMemory((BYTE*)0x12345678, patch, sizeof(patch));
+    std::cout << "Memory patched successfully!\n";
+    CloseHandle(hProcess);
+    return 0;
+}
+```
+✔ This simple patcher finds an instruction in memory and replaces it with NOPs, effectively disabling it.
+
+### 5. Automating Memory Patching with Python
+- 📌 Example: Patching memory using Python
+```
+import ctypes
+
+PROCESS_ALL_ACCESS = 0x1F0FFF
+address = 0x12345678  # Replace with target memory address
+patch = b"\x90\x90\x90\x90\x90"  # NOPs
+
+# Open process
+pid = int(input("Enter target process ID: "))
+handle = ctypes.windll.kernel32.OpenProcess(PROCESS_ALL_ACCESS, False, pid)
+# Write new bytes to memory
+written = ctypes.c_size_t(0)
+ctypes.windll.kernel32.WriteProcessMemory(handle, address, patch, len(patch), ctypes.byref(written))
+print("Memory patched successfully!")
+```
+
+✔ This Python script automates memory patching in any running process.
 
 
+## 10.3 Emulating License Servers and Key Checks
+### [top](#table-of-contents)
+
+### 1. Understanding License Servers and Key Checks
+- 🔹 Online License Servers
+  - ● Software sends a request to a remote server (e.g., check.licenseserver.com).
+  - ● The server verifies the key and sends back a YES or NO response.
+  - ● If the response is valid, the software unlocks.
+
+- 🔹 Offline Activation (File-Based or Local Checks)
+  - ● Software generates a request file (request.lic).
+  - ● User submits this file to a website or customer support.
+  - ● A response file (license.lic) is generated and applied to the software.
+
+- 🔹 Hybrid Activation (Online + Offline Methods)
+  - ● Requires an initial internet activation, then allows offline use.
+  - ● Software may periodically phone home to revalidate the license.
+
+### 2. Intercepting and Analyzing License Requests
+- 🔹 Tools for Intercepting License Requests:
+  - ✅ `Wireshark` – Sniff network traffic to capture license key requests.
+  - ✅ `Burp Suite` / `Fiddler` – Proxy web traffic to inspect API calls.
+  - ✅ `Frida` – Hook into the program to intercept API requests dynamically.
+
+💡 Pro Tip: If the connection is encrypted (HTTPS), try using mitmproxy or redirect the traffic to a local test server.
+
+### 3. Emulating a License Server Locally
+- 🔹 Method 1: Modifying the Hosts File (Redirect Traffic Locally)
+  - 📌 On Windows (C:\Windows\System32\drivers\etc\hosts):
+```
+127.0.0.1 licenseserver.com
+```
+  - 📌 On Linux/Mac (/etc/hosts):
+```
+127.0.0.1 licenseserver.com
+```
+Now, all requests to licenseserver .com will go to localhost.
+
+- 🔹 Method 2: Running a Fake License Server
+  - ✅ Example Python Flask Server for Emulating License Validation:
+```
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+@app.route('/validate', methods=['POST'])
+
+def validate_license():
+    data = request.json
+    if data["license_key"] == "ABC123-XYZ789":
+    return jsonify({"status": "valid", "expiration": "never"})
+    return jsonify({"status": "invalid"})
+
+if __name__ == '__main__':
+    app.run(host="0.0.0.0", port=80)
+```
+✔ Now, when the software checks for a license, our fake server always returns "valid"!
+
+### 4. Bypassing Local Key Checks (Patch Instead of Emulate)
+- 🔹 Finding the License Check in a Debugger
+  - ● Attach x64dbg or IDA Pro to the software.
+  - ● Search for strings like "Invalid license" or "License expired".
+  - ● Find the related comparison instruction (CMP EAX, 0).
+  - ● Modify the instruction to always succeed.
+
+  - ✅ Before (Assembly Code Checking License):
+```
+CMP EAX, 1      ; Compare if the key is valid
+JNE invalid     ; Jump to "invalid" message if not 1
+```
+  - ✅ After (Patched to Always Accept Any Key):
+```
+MOV EAX, 1      ; Force a valid key check
+NOP             ; No Operation (prevents crashes)
+```
+✔ Now, any key will be accepted! 🎉
+
+### 5. Writing a Keygen to Generate Valid Keys
+- 🔹 Extracting the License Key Algorithm
+  - ● Disassemble the software in IDA Pro.
+  - ● Look for key validation functions (e.g., CheckLicenseKey).
+  - ● Reverse engineer how the key is structured.
+  - ● Write a script to generate valid-looking keys.
+
+  - ✅ Example Python Keygen:
+```
+import random
+import hashlib
+
+def generate_key():
+    key = f"{random.randint(100,999)} - {random.randint(100,999)} - {random.randint(100,999)}"
+    checksum = hashlib.md5(key.encode()).hexdigest()[:5]
+    print("Generated Key:", generate_key())
+    return f"{key}-{checksum}"
+```
+✔ Now we have a working key generator that mimics the real license system!
+
+**Final Thoughts: The Art of Faking It**
 
 
+## 10.4 Automating Software Cracking with Python and Frida
+### [top](#table-of-contents)
 
+### 1. What is Frida, and Why Should You Care?
+- ✅ No need for static patching – Modify software in real-time without changing the executable.
+- ✅ Works on packed binaries – Even if software is packed or obfuscated, Frida can still hook into it.
+- ✅ Intercepts function calls dynamically – Hook into functions and modify return values on the fly.
+- ✅ Automates tedious manual work – Replace hours of debugging with a few lines of Python.
+
+### 2. Setting Up Frida and Python for Reverse Engineering
+- 🔹 Installing Frida
+  - 📌 On Windows, Linux, or macOS:
+```
+pip install frida frida-tools
+```
+  - 📌 On Android (for mobile hacking):
+```
+adb push frida-server /data/local/tmp/
+adb shell chmod +x /data/local/tmp/frida-server
+adb shell ./data/local/tmp/frida-server &
+```
+
+### 3. Hooking Functions to Bypass Protections
+- Original function to be protected:
+```
+bool isLicenseValid() {
+    return false;  // The software refuses to run without a license
+}
+```
+
+- 🔹 Hooking a Function with Frida in Python
+```
+import frida
+
+def on_message(message, data):
+    print(f"[+] {message}")
+    session = frida.attach("target.exe")
+    script = session.create_script("""
+        Interceptor.attach(Module.findExportByName(null, 'isLicenseValid'), {
+            onEnter: function(args) {
+                console.log("Intercepted isLicenseValid()!");
+            },
+            onLeave: function(retval) {
+                retval.replace(1);  // Force the function to always return true
+            }
+        });
+    """)
+
+script.on("message", on_message)
+script.load()
+input("Press Enter to exit...") 
+```
+✔ Now, whenever the software checks if the license is valid, Frida forces it to return true! 🎉
+
+### 4. Modifying Return Values of API Calls
+- 🔹 Example: Bypassing `CheckRemoteDebuggerPresent`
+Many programs use `CheckRemoteDebuggerPresent()` to detect if a debugger is attached. Let’s force it to always return false:
+```
+script = session.create_script("""
+    Interceptor .attach(Module.findExportByName("kernel32.dll", "CheckRemoteDebuggerPresent"), {
+        onEnter: function (args) {
+            console.log("Intercepted CheckRemoteDebuggerPresent!");
+        },
+        onLeave: function (retval) {
+            retval.replace(0);  // Tell the program "No debugger here!"
+        }
+    });
+""")
+```
+✔ Now, even if we’re debugging the program, it will think we’re not!
+
+### 5. Automating Software Cracking with Python
+- 🔹 Full Python Automation Script for Cracking Serial Key Checks
+```
+import frida
+
+def on_message(message, data):
+    print(f"[+] {message}")
+    session = frida.attach("target.exe")
+    script = session.create_script("""
+    Interceptor.attach(Module.findExportByName(null, 'validateSerialKey'), {
+        onLeave: function(retval) {
+            console.log("Intercepted Serial Key Validation!");
+            retval.replace(1);  // Force the function to always return success
+        }
+    });
+""")
+
+script.on("message", on_message)
+script.load()
+input("Press Enter to exit...") 
+```
+✔ Now, no matter what key the user enters, the software thinks it's valid! 🔥
+
+### 6. Dumping Secret Data from Memory
+- 🔹 Example: Dumping Passwords or Encryption Keys
+```
+script = session.create_script("""
+    var target_addr = ptr('0x12345678'); // Replace with the real memory address
+    Interceptor.attach(target_addr , {
+        onEnter: function(args) {
+            console.log("Data in memory: " +
+            Memory.readUtf8String(args[0]));
+        }
+    });
+""")
+```
+✔ Now, we can extract encryption keys, passwords, and other sensitive data from memory!
+
+### 7. Automating Patching with Frida
+- 🔹 Example: Removing a Nag Screen (Annoying Popup)
+> Some trial software displays a nag screen to remind users to buy the full version. We can use Frida to disable it:
+```
+script = session.create_script("""
+    Interceptor.attach(Module.findExportByName(null, 'showNagScreen'),
+    {
+        onEnter: function(args) {
+            console.log("Blocking Nag Screen!");
+            return 0; // Prevent the function from executing
+        }
+    });
+""")
+```
+✔ Now, the annoying popups are gone forever!
+
+**Final Thoughts: Automate Everything!**
+
+
+## 10.5 Case Study: Defeating an Advanced DRM System
+
+### [top](#table-of-contents)
