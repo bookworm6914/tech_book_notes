@@ -6,8 +6,13 @@
 
 ## Table of Contents
 
+- [Books on DevOps](#devops-book-notes)
 - [Books on Python](#python-book-notes)
 - [Books on Security](#security-book-notes)
+
+## Books on DevOps
+
+* [Quick Start Kubernetes 2025 Edition](Quick-Start-Kubernetes-2025-Edition.md)
 
 ## Books on Python
 
