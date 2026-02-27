@@ -7,12 +7,15 @@
 - [**Amazon URL**](https://www.amazon.com/Advanced-Python-Tips-explained-Simply/dp/1077001339/)
 - [**Original Books Notes**](Advanced-Python-Tips-A-Simple-Book-on-Advanced-Python-concepts-2020_original_notes.txt)
 
-### page8
-** This book is about efficient and readable code. **
 
-## Chapter 1: Minimize for loop usage in Python
+**Page 8**
 
-### page10
+This book is about `efficient` and `readable code`.
+
+
+# Chapter 1: Minimize for loop usage in Python
+
+**Page 10**
 ```
 x = [1,3,5,7,9]
 sum_squared = 0
@@ -24,7 +27,7 @@ or
 x = [1,3,5,7,9]
 sum_squared = sum([y**2 for y in x])
 ```
-This is called List Comprehension. What about **if-else**?
+This is called List Comprehension. What about if-else?
 ```
 x = [1,2,3,4,5,6,7,8,9]
 squared_cubed = [y**2 if y%2==0 else y**3 for y in x]
@@ -32,7 +35,7 @@ squared_cubed = [y**2 if y%2==0 else y**3 for y in x]
 [1, 4, 27, 16, 125, 36, 343, 64, 729]
 ```
 
-### page13
+**Page 13**
 Dictionary Comprehension:
 ```
 x = [1,2,3,4,5,6,7,8,9]
@@ -53,25 +56,23 @@ x = [1,2,3,4,5,6,7,8,9]
 {1: 1, 2: 4, 3: 27, 4: 16, 5: 125, 6: 36, 7: 343, 8: 64, 9: 729}
 ```
 
-### Rule
-**Use List Comprehensions and Dict comprehensions when you need a for loop. Use enumerate if you need array index.**
+**Rule:**
+
+Use List Comprehensions and Dict comprehensions when you need a for loop. Use enumerate if you need array index.
 
 
-## Chapter 2: Python defaultdict and Counter
+# Chapter 2: Python defaultdict and Counter
+### [top](#table-of-contents)
 
-### page16
+**Page 16**
+
 To count the occurrance of the words in a sentence or paragraph:
 ```
-# method 1
-
 from collections import defaultdict
-
 word_count_dict = defaultdict(int)
 for w in text.split(" "):
     word_count_dict[w]+=1
 
-
-# method 2
 
 from collections import Counter
 word_count_dict = Counter()
@@ -84,13 +85,16 @@ word_count_dict.most_common(10)
 ```
 
 
-## Chapter 3: *args, **kwargs, decorators for Data Scienঞsts
+# Chapter 3: *args, **kwargs, decorators for Data Scienঞsts
+### [top](#table-of-contents)
 
-### page21
-What are `*args`?
-In simple terms, you can use `*args` to give an arbitrary number of inputs to your function.
+**Page 21**
 
-Please note that we can use `*args` or `*argv` or `*anyOtherName` to do this. It is the `*` that matters.
+What are *args?
+
+In simple terms, you can use *args to give an arbitrary number of inputs to your function.
+
+Please note that we can use *args or *argv or *anyOtherName to do this. It is the * that matters.
 ```
 def adder(*args):
     result = 0
@@ -105,9 +109,11 @@ adder(1,2,5,7,8,9,100)
 This is how the python print() frunction can take so many arguments.
 
 
-### page23
-What are `**kwargs`?
-In simple terms, you can use `**kwargs` to give an arbitrary number of Keyworded inputs to your function and access them using a dictionary.
+**Page 23**
+
+What are **kwargs?
+
+In simple terms, you can use **kwargs to give an arbitrary number of Keyworded inputs to your function and access them using a dictionary.
 ```
 def myprint(name,age):
 print(f'{name} is {age} years old')
@@ -126,8 +132,10 @@ Tyrion is 40 years old
 Arya is 17 years old
 ```
 
-### page25
+**Page 25**
+
 What are Decorators?
+
 In simple terms: Decorators are functions that wrap another function thus modifying its behavior.
 
 original function:
@@ -174,7 +182,8 @@ Output
 'somefunc' ends in 2.86102294921875e-06 secs
 ```
 
-### page28
+**Page 28**
+
 What if our function takes three arguments? Or many arguments?
 ```
 import time
@@ -192,42 +201,47 @@ def timer(func):
 ```
 
 
-## Chapter 4: Use Itertools, Generators, and Generator Expressions
+# Chapter 4: Use Itertools, Generators, and Generator Expressions
+### [top](#table-of-contents)
 
-### page36
-Put simply Generators provide us ways to write iterators easily using the yield statement.
+**Page 35**
+
+Every iterator needs to have:
+- 1. an `__iter__` method that returns self, and
+- 2. an `__next__` method that returns the next value.
+- 3. a StopIteration exception that signifies the ending of the iterator.
 ```
-def triplet(n): # Find all the Pythagorean triplets between 1 and n
-    for a in range(n):
-        for b in range(a):
-            for c in range(b):
-                if a*a == b*b + c*c:
-                    yield(a, b, c)
-
-
-triplet_generator = triplet(1000)
-for x in triplet_generator:
-    print(x)
-------------------------------------------------------------
-(5, 4, 3)
-(10, 8, 6)
-(13, 12, 5)
-(15, 12, 9)
-.....
+def Primes(max):
+	number = 1
+	generated = 0
+	while generated < max:
+		number += 1
+		if check_prime(number):
+			generated+=1
+			yield number
 ```
 
 
-## Chapter 5: How and Why to use f strings in Python3?
+# Chapter5: How and Why to use f strings in Python3
+### [top](#table-of-contents)
 
-### page43
-`f` strings in Python that was introduced in Python **3.6**.
-For example:
+**Page 44**
 ```
+name = 'Andy'
+age = 20
+print("I am " + name + ". I am " + str(age) + " years old")
+----------------------------------------------------------------
+I am Andy. I am 20 years old
+
+
+print("I am %s. I am %s years old" % (name, age))
+
+print("I am {}. I am {} years old".format(name, age))
+
+print("I am {name}. I am {age} years old".format(name = name, age = age))
+
+data = {'name':'Andy','age':20}
+print("I am {name}. I am {age} years old".format(**data))
+
 print(f"I am {name}. I am {age} years old")
-```
-
-### page47
-more examples:
-```
-    print(f"{data['name']} has {totalFruits(apples,oranges)} fruits")
 ```
