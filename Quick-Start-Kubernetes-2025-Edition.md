@@ -7,6 +7,7 @@
 - [**Amazon URL**](https://www.amazon.com/Quick-Start-Kubernetes-Nigel-Poulton/dp/1916585027/)
 - [**Original Books Notes**](Quick-Start-Kubernetes-2025-Edition.txt)
 
+# Table of Content
 - [Chapter 1: What is Kubernetes](#chapter-1-what-is-kubernetes)
 - [Chapter 2: Why Kubernetes is so important](#chapter-2-why-kubernetes-is-so-important)
 - [Chapter 3: Kubernetes architecture](#chapter-3-kubernetes-architecture)
