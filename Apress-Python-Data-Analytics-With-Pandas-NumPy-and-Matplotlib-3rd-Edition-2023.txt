@@ -1,0 +1,963 @@
+
+=====Chapter 1: An Introduction to Data Analysis
+
+Among the most commonly used statistical techniques in data analysis are
+•  Bayesian methods
+•  Regression
+•  Clustering
+
+
+Data can be divided into two distinct categories:
+•  Categorical (nominal and ordinal)
+•  Numerical (discrete and continuous)
+
+
+The Data Analysis Process:
+•  Problem definition
+•  Data extraction
+•  Data preparation - data cleaning
+•  Data preparation - data transformation
+•  Data exploration and visualization
+    •  Visualization and interpretation of results
+    •  Summarizing data
+    •  Grouping data
+    •  Exploring the relationship between the various attributes
+    •  Identifying patterns and trends
+•  Predictive modeling
+    •  Classification models: If the result obtained by the model type is categorical.
+    •  Regression models: If the result obtained by the model type is numeric.
+    •  Clustering models: If the result obtained by the model type is a segmentation.
+•  Model validation/testing
+•  Deployment of the solution (implementation of the solution in the real world)
+    •  Analysis results
+    •  Decision deployment
+    •  Risk analysis
+    •  Measuring the business impact
+
+
+Open Data
+In support of the growing demand for data, a huge number of data sources are now available on the Internet. 
+These data sources freely provide information to anyone in need, and they are called open data.
+
+•  Kaggle (www.kaggle.com/datasets) is a huge community of apprentices and expert 
+data scientists who provide a vast amount of datasets and code that they use for 
+their analyses. The extensive documentation and the introduction to every aspect 
+of machine learning are also excellent. They also hold interesting competitions 
+organized around the resolution of various problems.
+
+•  DataHub (datahub.io/search) is a community that makes a huge amount of 
+datasets freely available, along with tools for their command-line management. The 
+dataset topics cover various fields, ranging from the financial market, to population 
+statistics, to the prices of cryptocurrencies.
+
+•  Nasa Earth Observations (https://neo.gsfc.nasa.gov/dataset_index.php/) 
+provides a wide range of datasets that contain data collected from global climate and 
+environmental observations.
+
+•  World Health Organization (www.who.int/data/collections) manages and 
+maintains a wide range of data collections related to global health and well-being.
+
+•  World Bank Open Data (https://data.worldbank.org/) provides a listing of 
+available World Bank datasets covering financial and banking data, development 
+indicators, and information on the World Bank’s lending projects from 1947 to the 
+present.
+
+•  Data.gov (https://data.gov) is intended to collect and provide access to the 
+U.S. government’s Open Data, a broad range of government information collected at 
+different levels (federal, state, local, and tribal).
+
+•  European Union Open Data Portal (https://data.europa.eu/en) collects and 
+makes publicly available a wide range of datasets concerning the public sector of the 
+European member states.
+
+•  Healthdata.gov (www.healthdata.gov/) provides data about health and health care 
+for doctors and researchers so they can carry out clinical studies and solve problems 
+regarding diseases, virus spread, and health practices, as well as improve the level of 
+global health.
+
+•  Google Trends Datastore (https://googletrends.github.io/data/) collects and 
+makes available the collected data divided by topic of the famous and very useful 
+Google Trends, which is used to carry out analyses on its own account.
+
+
+
+=====Chapter 2: Introduction to the Python World
+
+typical python euntimes:
+•  CPython      written in C and is the most popular Python runtime.
+•  Cython       based on CPython and translates python code to C and speed it up. https://cython.readthedocs.io/en/latest/
+•  Pyston       is a fork of the CPython interpreter that implements performance optimization. https://www.pyston.org/
+•  Jython       In parallel to Cython and is implemented in Java. https://www.jython.org/
+•  IronPython   implemented in the .NET framework. https://ironpython.net/
+•  PyPy         a JIT (just-in-time) compiler, and it converts the Python code directly to machine code at runtime. https://www.pypy.org/
+•  RustPython   a Python interpreter written in Rust. https://rustpython.github.io/
+
+
+PyPI — The Python Package Index         https://pypi.python.org/pypi
+
+$ pip install <<package_name>>
+$ pip search <<package_name>>
+$ pip show <<package_name>>
+$ pip unistall <<package_name>>
+
+
+popular python IDEs:
+    Spyder      Eclipse (pyDev)     Sublime       Liclipse        NinjaIDE        Komodo IDE        PyCharm
+
+
+popular python packages:
+SciPy   a set of open-source Python libraries specialized for scientific computing
+    •  NumPy        the foundation library for scientific computing
+    •  matplot      provides complex data structures and functions specifically designed to make the work on them easy, fast, and effective.
+                        This package is the core of data analysis in Python.
+    •  Pandas       the most popular for producing plots and other data visualizations in 2D
+
+
+
+=====Chapter 3: The NumPy Library
+
+$ pip install numpy
+
+>>> import numpy as np
+
+
+ndarray (N-dimensional array): The Heart of the Library
+
+>>> a = np.array([1, 2, 3])
+>>> a
+array([1, 2, 3])
+>>> a.dtype
+dtype('int32')
+>>> a.ndim
+1
+>>> a.size
+3
+>>> a.shape
+(3,)
+
+
+>>> c = np.array([[1, 2, 3],[4, 5, 6]])
+>>> c
+array([[1, 2, 3],
+       [4, 5, 6]])
+
+
+>>> e = np.array([(1, 2, 3), [4, 5, 6], (7, 8, 9)])
+>>> e
+array([[1, 2, 3],
+       [4, 5, 6],
+       [7, 8, 9]])
+
+
+>>> f = np.array([[1, 2, 3],[4, 5, 6]], dtype=complex)
+>>> f
+array([[ 1.+0.j,  2.+0.j,  3.+0.j],
+       [ 4.+0.j,  5.+0.j,  6.+0.j]])
+
+
+>>> np.ones((3, 3))
+array([[ 1.,  1.,  1.],
+       [ 1.,  1.,  1.],
+       [ 1.,  1.,  1.]])
+
+
+>>> np.arange(4, 10)
+array([4, 5, 6, 7, 8, 9])
+>>> np.arange(0, 12, 3)
+array([0, 3, 6, 9])
+>>> np.arange(0, 6, 0.6)
+array([ 0. ,  0.6,  1.2,  1.8,  2.4,  3. ,  3.6,  4.2,  4.8,  5.4])
+
+
+>>> np.arange(0, 12).reshape(3, 4)
+array([[ 0,  1,  2,  3],
+       [ 4,  5,  6,  7],
+       [ 8,  9, 10, 11]])
+
+
+p65
+Table 3-1.  Data Types Supported by NumPy
+
+Data        Type Description
+====        ================
+bool_       Boolean (true or false) stored as a byte
+int_        Signed integer type (same as C long and Python int; normally either int64 or int32 depending on the platform)
+intc        Signed integer type, identical to C int (normally int32 or int64)
+intp        Integer used for indexing (same as C size_t; normally either int32 or int64)
+int8        Alias for the signed integer type with 8 bits (–128 to 127)
+int16       Alias for the signed integer type with 16 bits (–32768 to 32767)
+int32       Alias for the signed integer type with 32 bits (–2147483648 to 2147483647)
+int64       Alias for the signed integer type with 64 bits (–9223372036854775808 to 9223372036854775807)
+uint8       Alias for the unsigned integer type with 8 bits (0 to 255)
+uint16      Alias for the unsigned integer type with 16 bits (0 to 65535)
+uint32      Alias for the unsigned integer type with 32 bits (0 to 4294967295)
+uint64      Alias for the unsigned integer type with 64 bits (0 to 18446744073709551615)
+float_      Shorthand for float64
+float16     Half precision float: sign bit, 5-bit exponent, 10-bit mantissa
+float32     Single precision float: sign bit, 8-bit exponent, 23-bit mantissa
+float64     Double precision float: sign bit, 11-bit exponent, 52-bit mantissa
+complex_    Shorthand for complex128
+complex64   Complex number, represented by two 32-bit floats (real and imaginary components)
+complex128  Complex number, represented by two 64-bit floats (real and imaginary components)
+
+
+bytes                     b1
+int                       i1, i2, i4, i8
+unsigned ints             u1, u2, u4, u8
+floats                    f2, f4, f8
+complex                   c8, c16
+fixed length strings      a<n>
+
+
+Arithmetic Operators:
+
+>>> a = np.arange(4)
+>>> a
+array([0, 1, 2, 3])
+>>> a+4
+array([4, 5, 6, 7])
+>>> a*2
+array([0, 2, 4, 6])
+
+>>> b = np.arange(4,8)
+>>> b
+array([4, 5, 6, 7])
+>>> a + b
+array([ 4,  6,  8, 10])
+>>> a – b
+array([–4, –4, –4, –4])
+>>> a * b
+array([ 0,  5, 12, 21])
+
+>>> np.dot(A,B)             # matrix product, same as A.dot(B)
+array([[  3.,   3.,   3.],
+       [ 12.,  12.,  12.],
+       [ 21.,  21.,  21.]])
+
+
+Aggregate Functions:  sum, min, max, mean, std
+
+
+
+=====Chapter 4: The pandas Library—An Introduction
+
+$ pip install pandas
+
+>>> import pandas as pd
+>>> import numpy as np
+
+pandas Data Structures:
+•  Series       the data structure designed to accommodate a sequence of   one-dimensional data
+•  Dataframes   the data structure designed to accommodate a sequence of multi-dimensional data
+
+>>> s = pd.Series([12,-4,7,9])
+>>> s
+0    12
+1    -4
+2     7
+3     9
+dtype: int64
+
+>>> s = pd.Series([12,-4,7,9], index=['a','b','c','d'])
+>>> s
+a    12
+b    -4
+c     7
+d     9
+dtype: int64
+
+>>> arr = np.array([1,2,3,4])
+>>> s3 = pd.Series(arr)
+>>> s3
+0    1
+1    2
+2    3
+3    4
+dtype: int64
+
+>>> s[s > 8]            # filtering data
+a    12
+d     9
+dtype: int64
+
+>>> s / 2               # math operations
+a    6.0
+b   -2.0
+c    3.5
+d    4.5
+dtype: float64
+
+
+>>> serd = pd.Series([1,0,2,1,2,3], index=['white','white','blue','green','green','yellow'])
+>>> serd.unique()
+array([1, 0, 2, 3], dtype=int64)>>> serd.value_counts()
+2    2
+1    2
+3    1
+0    1
+dtype: int64
+
+>>> serd.isin([0,3])
+white     False
+white      True
+blue      False
+green     False
+green     False
+yellow     True
+dtype: bool
+>>> serd[serd.isin([0,3])]
+white     0
+yellow    3
+dtype: int64
+
+
+NaN - Not a Number
+
+>>> s2 = pd.Series([5,-3,np.NaN,14])
+>>> s2
+0     5.0
+1    -3.0
+2   NaN
+3    14.0
+dtype: float64
+
+>>> s2.isnull()
+0    False
+1    False
+2     True
+3    False
+dtype: bool
+
+>>> s2.notnull()
+0     True
+1     True
+2    False
+3     True
+dtype: bool
+
+
+>>> mydict = {'red': 2000, 'blue': 1000, 'yellow': 500, 'orange': 1000}
+>>> myseries = pd.Series(mydict)
+>>> myseries
+red       2000
+blue      1000
+yellow     500
+orange    1000
+dtype: int64
+
+
+The dataframe is a tabular data structure very similar to a spreadsheet.
+
+>>> data = {'color' : ['blue','green','yellow','red','white'],
+            'object' : ['ball','pen','pencil','paper','mug'],
+            'price' : [1.2,1.0,0.6,0.9,1.7]}
+>>> frame = pd.DataFrame(data)
+>>> frame
+    color  object price
+0    blue    ball   1.2
+1   green     pen   1.0
+2  yellow  pencil   0.6
+3     red   paper   0.9
+4   white     mug   1.7
+
+>>> frame.columns
+Index(['colors', 'object', 'price'], dtype='object')
+>>> frame.index
+RangeIndex(start=0, stop=5, step=1)
+>>> frame.values
+array([['blue', 'ball', 1.2],
+       ['green', 'pen', 1.0],
+       ['yellow', 'pencil', 0.6],
+       ['red', 'paper', 0.9],
+       ['white', 'mug', 1.7]], dtype=object)
+
+>>> frame['price']              # or frame.price
+0    1.2
+1    1.0
+2    0.6
+3    0.9
+4    1.7
+Name: price, dtype: float64
+
+>>> frame.loc[2]
+color     yellow
+object    pencil
+price        0.6
+Name: 2, dtype: object
+
+>>> frame.loc[[2,4]]
+    color  object  price
+2  yellow  pencil    0.6
+4   white     mug    1.7
+
+>>> frame[1:3]
+    color  object  price
+1   green     pen    1.0
+2  yellow  pencil    0.6
+
+>>> frame['object'][3]
+'paper'
+
+>>> frame.isin([1.0,'pen'])         # membership checks
+   color object  price  new
+0  False  False  False  False
+1  False   True   True  True
+2  False  False  False  False
+3  False  False  False  False
+4  False  False  False  False
+
+>>> frame[frame.isin([1.0,'pen'])]
+  color object  price  new
+0   NaN    NaN    NaN  NaN
+1   NaN    pen    1.0  1.0
+2   NaN    NaN    NaN  NaN
+3   NaN    NaN    NaN  NaN
+4   NaN    NaN    NaN  NaN
+
+>>> del frame['new']                # delete a column
+
+>>> frame[frame['price'] < 1.2]     # filtering
+>>> frame
+   colors  object price
+1   green     pen   1.0
+3     red   paper   0.9
+
+
+Sorting and Ranking:
+
+>>> ser = pd.Series([5,0,3,8,4],
+...     index=['red','blue','yellow','white','green'])
+>>> ser
+red       5
+blue      0
+yellow    3
+white     8
+green     4
+dtype: int64
+>>> ser.sort_index()
+blue      0
+green     4
+red       5
+white     8
+yellow    3
+dtype: int64
+>>> ser.sort_values()
+blue      0
+yellow    3
+green     4
+red       5
+white     8
+dtype: int64
+
+>>> ser.rank()
+red       4.0
+blue      1.0
+yellow    2.0
+white     5.0
+green     3.0
+dtype: float64
+>>> ser.rank(method='first')
+red       4.0
+blue      1.0
+yellow    2.0
+white     5.0
+green     3.0
+dtype: float64
+>>> ser.rank(ascending=False)
+red       2.0
+blue      5.0
+yellow    4.0
+white     1.0
+green     3.0
+dtype: float64
+
+
+>>> frame = pd.DataFrame(np.arange(16).reshape((4,4)),
+...                   index=['red','blue','yellow','white'],
+...                   columns=['ball','pen','pencil','paper'])
+>>> frame
+        ball  pen  pencil  paper
+red        0    1       2      3
+blue       4    5       6      7
+yellow     8    9      10     11
+white     12   13      14     15
+
+>>> frame.sort_values(by='pen')
+        ball  pen  pencil  paper
+red        0    1       2      3
+blue       4    5       6      7
+yellow     8    9      10     11
+white     12   13      14     15
+>>> frame.sort_values(by=['pen','pencil'])
+        ball  pen  pencil  paper
+red        0    1       2      3
+blue       4    5       6      7
+yellow     8    9      10     11
+white     12   13      14     15
+
+
+statistical calculations such as correlation and covariance:  corr() and cov()
+>>> seq2 = pd.Series([3,4,3,4,5,4,3,2],['2006','2007','2008','2009','2010','2011','2012','2013'])
+>>> seq = pd.Series([1,2,3,4,4,3,2,1],['2006','2007','2008','2009','2010','2011','2012','2013'])
+>>> seq.corr(seq2)
+0.7745966692414835
+>>> seq.cov(seq2)
+0.8571428571428571
+
+
+Filtering Out NaN Values in series:
+>>> ser.dropna()
+>>> ser[ser.notnull()]
+
+
+frames.dropna() will DELETE all rows and columns with a NaN value. To avoid that and only delete rows and columns when all elements are NaN:
+frames.dropna(how='all')
+
+
+
+=====Chapter 5: pandas: Reading and Writing Data
+
+Readers     Writers
+=======     =======
+read_csv    to_csv
+read_excel  to_excel
+read_hdf    to_hdf
+read_sql    to_sql
+read_json   to_json
+read_html   to_html
+read_stata  to_stata
+read_pickle to_pickle
+
+
+The pickle module implements a powerful algorithm for serialization and deserialization of a data structure 
+implemented in Python. Pickling is the process in which the hierarchy of an object is converted into a stream of bytes.
+
+This allows an object to be transmitted and stored, and then to be rebuilt by the receiver itself retaining all the original features.
+
+>>> import _pickle as pickle
+>>> data = { 'color': ['white','red'], 'value': [5, 7]}
+>>> pickled_data = pickle.dumps(data)
+>>> print(pickled_data)
+b'\x80\x04\x95/\x00\x00\x00\x00\x00\x00\x00}\x94(\x8c\x05color\x94]\x94(\x8c\x05white\x94\x8c\x03red\x94e\x8c\x05value\x94]\x94(K\x05K\x07eu.'
+
+>>> nframe = pickle.loads(pickled_data)
+>>> nframe
+{'color': ['white', 'red'], 'value': [5, 7]}
+
+
+deal with databases:
+$ pip install sqlalchemy
+
+>>> from sqlalchemy import create_engine
+>>> engine = create_engine('postgresql://scott:tiger@localhost:5432/mydatabase')
+>>> engine = create_engine('mysql+mysqldb://scott:tiger@localhost/foo')
+>>> engine = create_engine('oracle://scott:tiger@127.0.0.1:1521/sidname')
+>>> engine = create_engine('mssql+pyodbc://mydsn')
+>>> engine = create_engine('sqlite:///foo.db')
+
+
+>>> engine = create_engine('sqlite:///foo.db')
+>>> frame.to_sql('colors',engine)
+>>> pd.read_sql('colors',engine)
+
+
+Loading and Writing Data with PostgreSQL in a Docker Container:
+
+$ docker pull postgres
+$ docker run --name postgresql -e POSTGRES_USER=myusername -e POSTGRES_PASSWORD=mypassword -p 5432:5432 -v /data:/var/lib/postgresql/data -d postgres
+
+$ docker pull dpage/pgadmin4:latest
+$ docker run --name "pgadmin4" -p 8082:80 -e "PGADMIN_DEFAULT_EMAIL=user@domain.com" -e "PGADMIN_DEFAULT_PASSWORD=SuperSecret" -d dpage/pgadmin4
+$ docker inspect postgresql
+
+$ pip install psycopg2
+
+>>> import psycopg2
+>>> from sqlalchemy import create_engine
+>>> engine = create_engine('postgresql://myusername:mypassword@localhost:5432/postgres')
+
+>>> import pandas as pd
+>>> import numpy as np
+>>> frame = pd.DataFrame(np.random.random((4,4)),
+              index=['exp1','exp2','exp3','exp4'],
+              columns=['feb','mar','apr','may']);
+>>> frame.to_sql('dataframe',engine)
+4
+
+$ docker exec -it postgresql bash
+root@ecaad3f3da6f:/#
+root@ecaad3f3da6f:/# psql -h localhost -U myusername
+psql (15.3 (Debian 15.3-1.pgdg110+1))
+Type "help" for help.
+myusername=#
+
+
+Reading and Writing Data with a NoSQL Database: MongoDB
+
+$ docker pull mongo
+$ docker run --name mymongo -p 27017:27017 -d mongo
+$ pip install pymongo
+
+>>> from pymongo import MongoClient
+>>> client = MongoClient('localhost',27017)
+>>> db = client.mydatabase
+>>> db
+Database(MongoClient(host=['localhost:27017'], document_class=dict, tz_aware=False, connect=True), 'mydatabase')
+
+>>> collection = db.mycollection
+>>> db['mycollection']
+Collection(Database(MongoClient(host=['localhost:27017'], document_class=dict, tz_aware=False, connect=True), 'mydatabase'), 'mycollection')
+>>> collection
+Collection(Database(MongoClient(host=['localhost:27017'], document_class=dict, tz_aware=False, connect=True), 'mydatabase'), 'mycollection')
+
+# load data
+>>> import json
+>>> record = json.loads(frame.T.to_json()).values()
+>>> record
+dict_values([{'white': 0, 'red': 1, 'blue': 2, 'black': 3, 'green': 4}, {'white': 5,  
+'red': 6, 'blue': 7, 'black': 8, 'green': 9}, {'white': 10, 'red': 11, 'blue': 12,  
+'black': 13, 'green': 14}, {'white': 15, 'red': 16, 'blue': 17, 'black': 18, 'green': 19}])
+
+>>> collection.mydocument.insert_many(record)
+<pymongo.results.InsertManyResult at 0x2f54ac43540>
+
+
+
+=====Chapter 6: pandas in Depth: Data Manipulation
+•  Data preparation
+•  Data transformation
+•  Data aggregation
+
+
+•  Data preparation
+    •  Loading
+    •  Assembling
+        •  Merging
+             pandas.merge() function connects the rows in a dataframe based on one or more keys
+ >>> pd.merge(frame1,frame2,on='id')
+ >>> pd.merge(frame1, frame2, left_on='id', right_on='sid')
+ >>> pd.merge(frame1,frame2,on=['id','brand'],how='outer')          # To merge multiple keys
+ >>> pd.merge(frame1,frame2,right_index=True, left_index=True)      # Merging on an Index
+
+        •  Concatenating
+             pandas.concat() function concatenates the objects along an axis
+>>> array1 = np.arange(9).reshape((3,3))
+>>> array1
+array([[0, 1, 2],
+       [3, 4, 5],
+       [6, 7, 8]])
+>>> array2 = np.arange(9).reshape((3,3))+6
+>>> array2
+array([[ 6,  7,  8],
+       [ 9, 10, 11],
+       [12, 13, 14]])
+>>> np.concatenate([array1,array2],axis=1)
+array([[ 0,  1,  2,  6,  7,  8],
+       [ 3,  4,  5,  9, 10, 11],
+       [ 6,  7,  8, 12, 13, 14]])
+>>> np.concatenate([array1,array2],axis=0)
+array([[ 0,  1,  2],
+       [ 3,  4,  5],
+       [ 6,  7,  8],
+       [ 6,  7,  8],
+       [ 9, 10, 11],
+       [12, 13, 14]])
+
+        •  Combining
+             pandas.DataFrame.combine_first() function connects overlapped data in order to fill in missing values in a data structure by taking data from another structure
+>>> ser1 = pd.Series(np.random.rand(5),index=[1,2,3,4,5])
+>>> ser1
+1    0.942631
+2    0.033523
+3    0.886323
+4    0.809757
+5    0.800295
+dtype: float64
+>>> ser2 = pd.Series(np.random.rand(4),index=[2,4,5,6])
+>>> ser2
+2    0.739982
+4    0.225647
+5    0.709576
+6    0.214882
+dtype: float64
+>>> ser1.combine_first(ser2)
+1    0.942631
+2    0.033523
+3    0.886323
+4    0.809757
+5    0.800295
+6    0.214882
+dtype: float64
+>>> ser2.combine_first(ser1)
+1    0.942631
+2    0.739982
+3    0.886323
+4    0.225647
+5    0.709576
+6    0.214882
+dtype: float64
+
+# if you want a partial overlap, you can specify only the portion of the series you want to overlap
+>>> ser1[:3].combine_first(ser2[:3])
+1    0.942631
+2    0.033523
+3    0.886323
+4    0.225647
+5    0.709576
+dtype: float64
+
+    •  Reshaping (pivoting)
+    •  Removing
+>>> del frame1['ball']
+>>> frame1.drop('ball')
+
+•  Data transformation
+    •  Removing Duplicates
+>>> dframe = pd.DataFrame({ 'color': ['white','white','red','red','white'],'value': [2,1,3,3,2]})
+>>> dframe.duplicated()
+>>> dframe.drop_duplicates()
+
+    •  Mapping
+        •  replace()—Replaces values
+        •  map()—Creates a new column
+        •  rename()—Replaces the index values
+
+    •  Discretization and Binning p182
+    •  Detecting and Filtering Outliers p184
+    •  Permutation (random reordering) p185
+    •  Random Sampling p186
+
+•  Data aggregation
+    • GroupBy
+        •  Splitting—Division into groups of datasets
+        •  Applying—Application of a function on each group
+        •  Combining—Combination of all the results obtained by different groups
+    • Advanced Data Aggregation p195
+        transform() and apply() 
+
+
+
+=====Chapter 7: Data Visualization with matplotlib and Seaborn
+
+matplotlib is a Python library specializing in the development of two-dimensional charts (including 3D charts).
+In recent years, it has been widespread in scientific and engineering circles https://matplotlib.org/
+
+$ pip install matplotlib
+
+The three layers of the matplotlib architecture:
+•  Scripting
+       pylab and ppyplot
+•  Artist
+    •  The primitive artists are individual objects that constitute the basic elements that form a graphical representation in a plot,
+        for example a Line2D, or as a geometric figure such as a Rectangle or Circle, or even pieces of text.
+    •  The composite artists are graphic elements that are composed of several base elements, namely, the primitive artists.
+        Composite artists are for example the Axis, Ticks, Axes, and Figures.
+•  Backend
+    •  FigureCanvas is the object that embodies the concept of a drawing area.
+    •  Renderer is the object that draws on FigureCanvas.
+    •  Event is the object that handles user inputs (keyboard and mouse events).
+
+from pylab import *
+import matplotlib.pyplot as plt
+import numpy as np
+
+plt.axis([0,5,0,20])
+plt.title('My first plot')
+plt.plot([1,2,3,4],[1,4,9,16],'ro')
+
+
+import math
+import numpy as np
+t = np.arange(0,2.5,0.1)
+y1 = np.sin(math.pi*t)
+y2 = np.sin(math.pi*t+math.pi/2)
+y3 = np.sin(math.pi*t-math.pi/2)
+plt.plot(t, y1, 'b*', t, y2, 'g^', t, y3, 'ys')
+
+
+t = np.arange(0,5,0.1)
+y1 = np.sin(2*np.pi*t)
+y2 = np.sin(2*np.pi*t)
+plt.subplot(211)
+plt.plot(t,y1,'b-.')
+plt.subplot(212)
+plt.plot(t,y2,'r--')
+
+
+import matplotlib.pyplot as plt
+import numpy as np
+x = np.arange(-2*np.pi,2*np.pi,0.01)
+y = np.sin(x)/x
+y2 = np.sin(2*x)/x
+y3 = np.sin(3*x)/x
+plt.plot(x,y,'k--',linewidth=3)
+plt.plot(x,y2,'m-.')
+plt.plot(x,y3,color='#87a3cc',linestyle='--')
+
+
+p229
+Table 7-2.  Color Codes
+Code    Color
+====    =====
+b       blue
+g       green
+r       red
+c       cyan
+m       magenta
+y       yellow
+k       black
+w       white
+
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+data = {'series1':[1,3,4,3,5],
+        'series2':[2,4,5,2,4],
+        'series3':[3,2,3,1,3]}
+df = pd.DataFrame(data, index=['A','B','C','D','E'])
+df.plot(kind='bar', xlabel='Class',rot=0, ylabel='Value')
+
+
+3D Surfaces
+
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection="3d")
+X = np.arange(-2,2,0.1)
+Y = np.arange(-2,2,0.1)
+X,Y = np.meshgrid(X,Y)
+
+def f(x,y):
+   return (1 - y**5 + x**5)*np.exp(-x**2-y**2)
+
+ax.plot_surface(X,Y,f(X,Y), rstride=1, cstride=1)
+
+
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
+fig = plt.figure()
+ax = fig.add_subplot(111, projection="3d")
+X = np.arange(-2,2,0.1)
+Y = np.arange(-2,2,0.1)
+X,Y = np.meshgrid(X,Y)
+
+def f(x,y):
+    return (1 - y**5 + x**5)*np.exp(-x**2-y**2)
+
+ax.plot_surface(X,Y,f(X,Y), rstride=1, cstride=1, cmap=plt.cm.hot)
+ax.view_init(elev=30,azim=125)
+
+
+
+=====Chapter 8: Machine Learning with scikit-learn
+
+scikit-learn is a Python module that integrates many machine learning algorithms.
+
+•  Supervised Learning
+    •  Classification—The data in the training set belong to two or more classes or categories; then, the data, already being labeled, 
+        allow you to teach the system to recognize the characteristics that distinguish each class. When you need to consider a new
+        value unknown to the system, the system can evaluate its class according to its characteristics.
+    •  Regression—When the value to be predicted is a continuous variable. The simplest case to understand is when you want to find 
+        the line that describes the trend from a series of points represented in a scatterplot.
+•  Unsupervised Learning
+    •  Clustering—The goal of these methods is to discover groups of similar examples in a dataset.
+    •  Dimensionality reduction—Reduction of a high-dimensional dataset to one with only two or three dimensions is useful not just for
+        data visualization, but for converting data of very high dimensionality into data of much lower dimensionality such that each of 
+        the lower dimensions conveys much more information.
+
+
+Supervised Learning with scikit-learn
+•  Classification, using the Iris Dataset
+    •  K-Nearest Neighbors Classifier
+    •  Support Vector Machines (SVC)
+•  Regression, using the Diabetes Dataset
+    •  Linear Regression
+    •  Support Vector Machines (SVR)
+
+
+
+=====Chapter 9: Deep Learning with TensorFlow
+
+Deep Learning Python Frameworks:
+•  TensorFlow is an open source library for numerical calculation that bases its use on 
+    data flow graphs. These are graphs where the nodes represent the mathematical 
+    operations and the edges represent tensors (multidimensional data arrays). Its 
+    architecture is very flexible and can distribute the calculations on multiple CPUs and 
+    on multiple GPUs.
+•  Caffe2 is a framework developed to provide an easy and simple way to work on deep 
+    learning. It allows you to test model and algorithm calculations using the power of 
+    GPUs in the cloud.
+•  PyTorch is a scientific framework completely based on the use of GPUs. It works in a 
+    highly efficient way and was recently developed and is still not well consolidated. It is 
+    still proving a powerful tool for scientific research.
+•  Theano is the most used Python library in the scientific field for the development, 
+    definition, and evaluation of mathematical expressions and physical models. 
+    Unfortunately, the development team announced that new versions will no longer 
+    be released. However, it remains a reference framework thanks to the number of 
+    programs developed with this library, both in literature and on the web.
+
+
+How Artificial Neural Networks Are Structured:
+    input layer --> hidden layer --> output layer
+
+
+Single Layer Perceptron (SLP)
+Multilayer Perceptron (MLP)
+
+
+TensorFlow: Google’s Framework      https://www.tensorflow.org
+•  TensorBoard — A kit that allows the visualization of internal graphs of TensorFlow https://github.com/tensorflow/tensorboard
+•  TensorFlow Fold — Produces beautiful dynamic calculation charts https://github.com/tensorflow/fold
+•  TensorFlow Transform — Creates and manages input data pipelines https://github.com/tensorflow/transform
+
+Model Compiling:
+Once a model has been defined, it is necessary to compile it. This second step requires the choice of functions and training parameters:
+  – Loss function: Measures how accurate the model has to be during the training phase.
+  – Optimizer: Takes care of how and which parameters should be updated during the training phase.
+  – Metrics: The parameters used to monitor the progress of the training (and testing) of the model
+
+
+
+=====Chapter 10: An Example—Meteorological Data
+N/A
+
+
+
+=====Chapter 11: Embedding the JavaScript D3 Library in the IPython Notebook
+N/A
+
+
+
+=====Chapter 12: Recognizing Handwritten Digits
+N/A
+
+
+
+=====Chapter 13: Textual Data Analysis with NLTK
+The Natural Language Toolkit (NLTK)
+
+NLTK is nothing more than a Python library (www.nltk.org) in which there are many tools specialized in processing and text data analysis.
+NLTK was created in 2001 for educational purposes, then over time it developed to such an extent that it became a real analysis tool.
+
+$ pip install nltk
+
+
+
+=====Chapter 14: Image Analysis and Computer Vision with OpenCV
+
+Seeing is not just the acquisition of a two-dimensional image—above all it is the interpretation of the content of that area.
+The captured image is decomposed and elaborated into levels of representation  that are gradually more abstract (contours, 
+figures, objects, and words) and therefore recognizable by the human mind.
+
+Computer vision intends to process a two-dimensional image and extract the same levels of representation from it. 
+This is done through various operations that can be classified as follows:
+•  Detection: Detect shapes, objects, or other subjects of investigation in an image (for example, finding cars)
+•  Recognition: The identified subjects are then led back to generic classes (for example, subdividing cars by brands and types)
+•  Identification: An instance of the previous class is identified (for example, find my car)
+
+$ pip install opencv
+
+
