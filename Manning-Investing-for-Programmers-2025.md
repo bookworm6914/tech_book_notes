@@ -1,5 +1,5 @@
 <p align="center"> 
-<img src="Apress-Python-Data-Analytics-With-Pandas-NumPy-and-Matplotlib-3rd-Edition-2023.png">
+<img src="Manning-Investing-for-Programmers-2025.png">
 </p>
 
 # Investing for Programmers: Understanding markets through data and code
