@@ -9,6 +9,7 @@
 - [Books on DevOps](#devops-book-notes)
 - [Books on Python](#python-book-notes)
 - [Books on Security](#security-book-notes)
+- [Books on Everything Else](#books-on-everything-else)
 
 ## Books on DevOps
 
@@ -23,3 +24,5 @@
 ## Books on Software Security
 * [Cracking the Code - Reverse Engineering Software Protections (The Ultimate Reverse Engineering Guide From Beginner to Expert) 2025](Cracking-the-Code-Reverse-Engineering-Software-Protections_The-Ultimate-Reverse-Engineering-Guide-From-Beginner-to-Expert_2025.md)
 
+## Books on Everything Else
+* [Manning Investing for Programmers 2025](Manning-Investing-for-Programmers-2025)
