@@ -31,13 +31,13 @@
 - [Chapter 5: Income portfolios](#chapter-5-income-portfolios)
 - [Chapter 6: Building an asset monitor](#chapter-6-building-an-asset-monitor)
 - [Chapter 7: Risk management](#chapter-7-risk-management)
-- [Chapter 8: ]()
-- [Chapter 9: ]()
-- [Chapter 10: ]()
-- [Chapter 11: ]()
-- [Chapter 12: ]()
-- [Chapter 13: ]()
-
+- [Chapter 8: AI for financial research](#chapter-8-ai-for-financial-research)
+- [Chapter 9: AI agents](#chapter-9-ai-agents)
+- [Chapter 10: Charts and technical analysis](#chapter-10-charts-and-technical-analysis)
+- [Chapter 11: Algorithmic trading](#chapter-11-algorithmic-trading)
+- [Chapter 12: Private equity: Investing in start-ups](#chapter-12-private-equity-investing-in-start-ups)
+- [Chapter 13: The road goes ever on and on](#chapter-13-the-road-goes-ever-on-and-on)
+- [Appendix A](#appendix-a)
 
 **liveBook discussion forum**        https://livebook.manning.com/book/investing-for-programmers/discussion
 
@@ -972,14 +972,770 @@ add_live_data(COL_WORKSHEET_ETF,
 # Chapter 7: Risk management
 ### [top](#table-of-contents)
 
+###  Classifying risks
+
+#### page 173
+Figure 7.3 How to map risk in a matrix based on severity and likelihood
+
+| Likelihood  | Harm severity: Minor | Marginal | Critical | Catastrophic |
+|-------------|----------------------|----------|----------|--------------|
+| Certain     | High                 | High | Very High | Very High |
+| Likely      | Medium               | High | High | Very High |
+| Possible    | Low                  | Medium | High | Very High |
+| Unlikely    | Low                  | Medium | Medium | High |
+| Rare        | Low                  | Low | Medium | Medium |
+| Eliminated  | Eliminated           | Eliminated | Eliminated |
+
+Assessing risks also means understanding beta, a measure of an asset’s sensitivity to market fluctuations:
+-  `Beta = 1` — Moves with the market
+-  `Beta > 1` — More volatile than the market
+-  `Beta < 1` — More stable than the market
+
+-  Market risk — Stock prices are significantly affected by overall market trends.
+-  Sector risk — Investing in stocks concentrated in a specific sector (e.g., technology, energy) exposes investors to risks that may affect that entire sector
+-  Asset-specific risk — Individual stocks carry the risk of poor performance due to company-specific issues such as mismanagement, declining sales, product failures, or scandals. This is also known as unsystematic risk.
+
+###  Mitigating risks 
+**Value at risk** (`VaR`) is a tool for measuring the potential loss of an investment or portfolio over a specified period,
+under normal market conditions, at a given confidence level.
+
+-  You monitor a portfolio (a collection of assets).
+-  You need a time frame (e.g., days, months) and a confidence level.
+-  These can be used to determine risk, such as the following: “We’re 95% confident that the portfolio won’t lose more than $30,000 in one day.”
 
 
+To calculate `VaR`, we simulate the potential future risks based on historical data. There are two common approaches:
+-  Variance - coeffect method—This approach assumes that returns follow a normal distribution. It’s similar to predicting load times using standard deviation.
+-  Monte Carlo simulation — This method simulates numerous potential outcomes, like stress-testing code under various edge cases.
+
+> A `Monte Carlo simulation` is a computational technique for modeling the probability of different outcomes in a process with inherent uncertainty.
+It relies on repeated random sampling to obtain numerical results, making it useful for scenarios where traditional analytical methods are infeasible.
+
+#### page 175
+Listing 7.1 Monte Carlo simulation for VaR on Apple
+```
+import numpy as np
+import yfinance as yf
+import matplotlib.pyplot as plt
+
+# Sets up the parameters
+ticker = "AAPL"
+confidence_level = 0.95
+num_simulations = 10000
+time_horizon = 1
+
+# Fetches historical stock data and calculates historical returns
+stock = yf.Ticker(ticker)
+hist = stock.history(period="1y")
+returns = hist['Close'].pct_change().dropna()
+
+# Estimates the mean and standard deviation of returns
+mu = returns.mean()
+sigma = returns.std()
+
+# Monte Carlo simulation of stock price paths
+last_price = hist['Close'].iloc[-1]            
+sim_returns = np.random.normal(mu, 
+                               sigma, 
+                               num_simulations)
+sim_prices = last_price * (1 + sim_returns)
+
+# Calculates VaR at given confidence level
+threshold = np.percentile(sim_prices - last_price, 
+                          (1 - confidence_level) * 100)
+
+# Puts out the result
+plt.hist(simulated_prices - last_price, bins=50, 
+         alpha=0.75, color="blue", edgecolor="black")
+plt.axvline(threshold, color="red", 
+         linestyle="dashed", linewidth=2)
+plt.title(f"Monte Carlo Simulated "
+          f"P&L Distribution for {ticker}")
+plt.xlabel("Profit/Loss")
+plt.ylabel("Frequency")
+plt.show()
+print(f"{confidence_level * 100}% Monte Carlo "
+      f"VaR for {ticker}: ${-var_threshold:.2f}")
+```
+
+> Correlation measures how assets move relative to one another.
+Positively correlated assets move in the same direction; negatively correlated ones move oppositely.
+It’s like service dependencies—when one microservice fails, does it take down others? 
+```
+def collect_prices_returns(tickers: list):
+    close_prices = pd.DataFrame()
+    log_returns = pd.DataFrame()
+
+    for ticker in tickers:
+        close_prices[ticker] = yf.Ticker(ticker).history(
+            start='2024-01-01', 
+            end='2024-12-31', 
+            interval="1d")['Close']
+        log_returns[ticker] = np.log(close_prices[ticker] 
+                                     / close_prices[ticker].shift(1))
+    return close_prices, log_returns
+
+tickers = ["MSFT", "AMZN", "GOOGL"]
+close_prices, log_returns  = collect_prices_returns(tickers)
+
+# run a fundamental statistical analysis
+price_stats = (
+    close_prices[tickers]
+    .agg(['mean', 'std', 'var'])
+    .T.reset_index()
+    .rename(columns={'index': 'ticker'})
+)
+```
+
+#### Negligence
+> Sometimes, that extra waiting period is the difference between a reckless gamble and a rational decision after a night’s rest.
+Like cybersecurity, investing isn’t just about technical expertise—it’s about controlling human behavior, including your own.
+
+To mitigate the risks, you can use dollar-cost averaging (DCA) — investing a fixed amount at regular intervals, regardless of market conditions.
+While not perfect timing, DCA reduces the risk of buying at a peak and smooths out market volatility over time.
+
+Some strategies carry exceptionally high risks:
+-  Leverage — Borrowing money to invest. While it amplifies gains, excessive leverage can lead to disastrous losses.
+-  Short selling — Betting against a stock. Losses are theoretically unlimited if the price rises instead.
+-  Derivatives — Complex financial instruments that can magnify both gains and risks.
 
 
+####  Hedging strategies (SKIPPED)
+Hedging is a risk management strategy that reduces or offsets potential losses, like insurance.
 
+Derivatives are arrangements whose value derives from an underlying asset, such as a commodity, currency, or security. They can be categorized this way:
+-  Options — Buying a put option on your stock protects against price drops.
+-  Futures — A farmer selling wheat futures locks in a price, avoiding losses if prices fall.
+-  Swaps   — Interest rate swaps help companies hedge against rate fluctuations.
 
+#### page 184
+Examples of options, futures and swaps
 
+Market trends are commonly symbolized by two animals: the bull and the bear. These aren’t just arbitrary animals; they symbolize specific movements in the market:
+-  Bull market — The bull charges upward with its horns, symbolizing a rising market.
+  - Stock prices are climbing, optimism is in the air, and investors feel confident.
+-  Bear market — The bear swipes downward with its paws, symbolizing a declining market.
+  - Stock prices are dropping, uncertainty looms, and fear takes over. 
+
+#### page 191
+> 10-Year Treasury Constant Maturity Minus 2-Year Treasury Constant Maturity
+Some investors see the spread between the yields on 10-year and 2-year US Treasury bonds as a yield curve proxy indicator of a recession.
+
+-  Optimizing your portfolio using the Markowitz model
+#### page 194
+Listing 7.3 Setting up variables
+```
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import yfinance as yf
+from datetime import datetime, timedelta
+def load_stocks(tickers, year_backs):
+    start_date = datetime.today() - timedelta(days=365*year_backs) 
+    end_date = datetime.today()
+    stock_data = yf.download(tickers, start=start_date, end=end_date)['Close']
+    return stock_data.pct_change().dropna()
+
+tickers = ["AAPL", "WMT", "GOOGL", "KO", "PFE", "BRK-B", "NVDA"]
+year_backs = 3
+returns = load_stocks(tickers, year_backs)
+```
+
+Listing 7.3 Setting up variables
+```
+TRADING_DAYS = 252
+
+# Annualized mean returns and covariance matrices
+mean_returns = returns.mean() * TRADING_DAYS
+cov_matrix = returns.cov() * TRADING_DAYS
+
+# Number of portfolios to simulate
+num_portfolios = 10000
+num_assets = len(tickers)
+
+port_returns = np.zeros(num_portfolios)
+port_volatility = np.zeros(num_portfolios)
+sharpe_ratios = np.zeros(num_portfolios)
+all_weights = np.zeros((num_portfolios, num_assets))
+```
+
+#### page 196
+Listing 7.4 Creating a Markowitz efficient portfolio
+```
+risk_free_rate = 0.0422
+
+# Monte Carlo simulation for random portfolios
+for i in range(num_portfolios):     
+    weights = np.random.dirichlet(np.ones(num_assets), size=1).flatten()
+    all_weights[i, :] = weights
+    port_returns[i] = np.dot(weights, mean_returns)
+    port_volatility[i] = np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights)))
+    sharpe_ratios[i] = (port_returns[i] - risk_free_rate) / port_volatility[i]
+
+# Finds the optimal Sharpe ratio portfolio
+max_sharpe_idx = np.argmax(sharpe_ratios)
+optimal_weights = all_weights[max_sharpe_idx, :]
+```
+
+Listing 7.5 Plotting the efficient frontier
+```
+# Sets plotting parameters
+plt.figure(figsize=(10, 6))                                
+plt.scatter(port_volatility, port_returns, c=sharpe_ratios, cmap='viridis', marker='o')
+plt.colorbar(label='Sharpe Ratio')
+plt.xlabel('Volatility (Risk)')
+plt.ylabel('Expected Return')
+plt.title('Efficient Frontier with Actual Stock Data')
+
+# Plots a scatter plot
+plt.scatter(port_volatility[max_sharpe_idx],
+            port_returns[max_sharpe_idx],
+            c='red', marker='*', s=200,
+            label='Max Sharpe Portfolio')
+plt.legend()
+plt.show()
+```
+
+To get the portfolio with its weights, we need only to get the results in a DataFrame and display them:
+```
+optimal_portfolio_df = pd.DataFrame({
+    'Stock': tickers,
+    'Optimal Weight': optimal_weights
+})
+
+print(optimal_portfolio_df)
+```
+
+###  Assessing nonfinancial risks
+
+**Shiller P/E ratio** --- often also referred to as the **CAPE ratio** [cyclically adjusted price-to-earnings ratio]
+-  `High` CAPE (overvalued market) — Reduce equity exposure and shift to bonds, gold, or alternatives.
+-  `Low` CAPE (undervalued market) — Increase equity exposure.
+
+There are three main strategies for rebalancing:
+-  Periodic rebalancing (time-based) — Rebalance on predefined intervals.
+-  Threshold-based rebalancing (percentage-based) — Rebalance only when an asset deviates by a certain percentage from the target allocation (e.g., ±5% drift).
+-  Hybrid approach (time + threshold) — Combine both methods.
+
+#### page 202
+Listing 7.6 Rebalancing preparation
+```
+# Defines the rebalancing threshold (e.g., 5% deviation from target)
+threshold = 0.05
+total_value = sum(current_portfolio.values())
+
+# Computes current allocations based on the weights
+current_allocation = {stock: value / total_value 
+                      for stock, value 
+                      in current_portfolio.items()}
+```
+
+Listing 7.7 Calculate required adjustments
+```
+dev = {
+    stock: current_allocation[stock] 
+    - target_allocation[stock] 
+    for stock in target_allocation
+}
+
+# Finds rebalancing
+rebalance_needed = {
+    stock: value 
+    for stock, value in dev.items()
+    if abs(value) > threshold
+}
+
+# Defines sell and buy actions
+adjustments = {}                                         
+for stock in rebalance_needed:                           
+    target_value = target_allocation[stock] * total_value
+    current_value = current_portfolio[stock]
+    adjustments[stock] = target_value - current_value
+
+# In the last step, we must put everything in a DataFrame and analyze the results to create a DataFrame that holds buy and sell recommendations:
+rebalance_df = pd.DataFrame({
+    "Stock": list(adjustments.keys()),
+    "Current Value ($)": [
+        current_portfolio[stock] 
+        for stock in adjustments
+    ],
+    "Target Value ($)": [
+        target_allocation[stock] * total_value
+        for stock in adjustments
+    ],
+    "Adjustment ($)": [
+        adjustments[stock] 
+        for stock in adjustments
+    ],
+    "Action": [
+        "Buy" if adj > 0 else "Sell" 
+        for adj in adjustments.values()
+    ]
+})
+```
+
+# Chapter 8: AI for financial research
 ### [top](#table-of-contents)
+
+**From code to machine learning**
+
+### page 209
+Listing 8.1 Calculating returns and volatility
+```
+prices_list = []
+start_date = datetime.now() - timedelta(days=365)
+
+# Loads historical price data
+for ticker in tickers:                          
+    prices = yf.download(ticker,
+                         start=start_date,
+                         interval="1d")['Close']
+    prices = pd.DataFrame(prices)
+    prices.columns = [ticker]
+    prices_list.append(prices)
+
+prices_df = pd.concat(prices_list,axis=1)
+prices_df.sort_index(inplace=True)
+
+# Calculates returns and volatility
+returns = pd.DataFrame()
+returns['Returns'] = prices_df.pct_change().mean() * 252
+returns['Volatility'] = (prices_df.pct_change().std()
+                        * sqrt(252))
+```
+
+Listing 8.2 Calculating elbow curve
+```
+data = np.asarray([np.asarray(returns['Returns']),
+                   np.asarray(returns['Volatility'])]).T
+distortions = []
+for k in range(2, 20):
+    k_means = KMeans(n_clusters=k)
+    k_means.fit(data)
+    distortions.append(k_means.inertia_)
+    
+fig = plt.figure(figsize=(15, 5))
+plt.plot(range(2, 20), distortions)
+plt.grid(True)
+plt.title('Elbow curve')
+```
+
+Listing 8.3 Creating clusters
+```
+centroids, _ = kmeans(data, 5)
+idx,_ = vq(data,centroids)
+details = [(name,cluster) for name, cluster in zip(returns.index,idx)]
+details_df = pd.DataFrame(details)
+details_df.columns = ['Ticker','Cluster']
+
+clusters_df = returns.reset_index()
+clusters_df['Cluster'] = details_df['Cluster']
+clusters_df.columns = ['Ticker', 'Returns', 'Volatility', 'Cluster']
+```
+
+Listing 8.4 Plotting
+```
+fig = px.scatter(clusters_df, x="Returns", 
+                 y="Volatility", color="Cluster", hover_data=["Ticker"])
+fig.update(layout_coloraxis_showscale=False)
+fig.update_traces(
+    marker=dict(size=8, symbol="diamond", 
+                line=dict(width=2, color="DarkSlateGrey")))
+fig.show()
+```
+
+### STOCK PRICE PREDICTION
+
+### page 214
+Listing 8.5 Loading data for the random forest
+```
+import yfinance as yf
+import pandas as pd
+import numpy as np
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+from statsmodels.tsa.arima.model import ARIMA
+import matplotlib.pyplot as plt
+
+start_date = "2018-01-01"
+end_date = "2023-01-01"
+ticker ="AAPL"
+df = yf.Ticker(ticker).history(start=start_date, end=end_date)
+df = df[["Open", "High", "Low", "Close", "Volume"]]
+
+df["Target"] = df["Close"].shift(-1)
+df.dropna(inplace=True)
+```
+
+Listing 8.6 Training data for the random forest
+```
+X = df.drop(columns=["Target"])
+y = df["Target"]
+X_train, X_test, y_train, y_test = train_test_split(X, y, shuffle=False,
+                                                    test_size=0.2)
+rf_model = RandomForestRegressor(n_estimators=100, random_state=42)
+rf_model.fit(X_train, y_train)
+rf_preds = rf_model.predict(X_test)
+rf_rmse = np.sqrt(mean_squared_error(y_test, rf_preds))
+results = pd.DataFrame({
+    "Date": df.index[-len(y_test):],
+    "Actual": y_test.values,
+    "RandomForest": rf_preds,
+}).set_index("Date")
+```
+
+Listing 8.7 Plotting the results
+```
+plt.figure(figsize=(12, 6))
+plt.plot(results.index, results["Actual"], label="Actual", linewidth=2
+plt.plot(results.index, results["RandomForest"], label="Random Forest"
+alpha=0.7, linestyle="dashed")
+plt.title("Stock Price Prediction: Random Forest")
+plt.xlabel("Date")
+plt.ylabel("Price")
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+```
+
+### 8.2 From machine learning to generative AI
+We ask GPT-4o, Gemini, and Finance Chat about investment strategies.
+-  What is the current trend in the stock market?
+-  Provide me with three reference examples that Warren Buffett would invest in based on his strategy that aren’t currently in his portfolio.
+-  Provide me with three reference examples of investments that Peter Lynch would make based on his strategy that aren’t currently in his portfolio.
+
+
+### 8.3 Practical use of GenAI
+- Using LLMs as research assistants:
+  - One specific use case of LLMs is passing these documents to an LLM and asking it to summarize them, focusing on the topics that are specifically interesting to you.
+
+
+### 8.4 Prompt engineering
+N/A
+
+
+# Chapter 9: AI agents
 ### [top](#table-of-contents)
+
+-  Building AI agents for structured research
+-  Using LangChain to build AI agents
+-  Reusing strong prompts for comparable research
+-  Exporting the results of your study to Notion
+
+
+### page 245
+Figure 9.1 A reference workflow for an AI agent
+
+**RAG** provides additional data to LLMs, bridging the gap between the model’s release and the prompt’s submission. For this use case, we defined three categories:
+-  RAG databases — Additional jobs collect data from different sources and provide this data in a vector database, which allows a workflow to supply this additional
+data to the generation workflow with LLMs.
+  - We need to be aware that we likely have to manage additional components that will require some maintenance.
+  - Data ingestion jobs will collect data from different sources to put them into a RAG database.
+-  Web searches—AI agents commonly provide a standardized interface to search engines so that they can use the content provided from search engines for the generation of responses.
+-  **Model context protocols** (`MCPs`)—An **MCP** is a new interface that allows AI agents to connect to data sources and collect data from data sources in a standardized format.
+  - We can see them as APIs designed explicitly for LLMs.
+  - If we need to get, for instance, the latest share price of a stock for a response, an LLM can query this information while it generates an answer.
+  - One significant advantage over RAG databases is that the more MCPs are available to us, the less we need to maintain jobs that aggregate the data for ourselves.
+
+
+### page 254
+Listing 9.5 Using LangChain with Yahoo
+```
+from langchain.agents import AgentType, initialize_agent
+from langchain_community.tools.yahoo_finance_news import YahooFinanceNewsTool
+
+tools = [YahooFinanceNewsTool()]
+agent_chain = initialize_agent(
+    tools,
+    llm,  # see listing 9.4
+    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    verbose=True,
+)
+
+agent_chain.invoke(
+    "What happened today with Microsoft stocks?",               # Submits the agent
+)
+```
+
+
+# Chapter 10: Charts and technical analysis
 ### [top](#table-of-contents)
+
+### page 279
+Figure 10.19 The anatomy of a bullish (white) and bearish (black) candlestick
+
+
+Listing 10.1 Creating candlestick charts
+```
+import mplfinance as mpf
+import pandas as pd
+import yfinance as yf
+
+ticker = "NVDA"
+data = yf.Ticker(ticker).history(start="2025-01-10", end="2025-01-15")
+df = pd.DataFrame(data).dropna()
+mpf.plot(df, type='candle', style='charles', title='Candlestick Chart')
+```
+
+### page 285
+Listing 10.4 Plotting Bollinger Bands
+```
+import yfinance as yf
+import pandas as pd
+import matplotlib.pyplot as plt
+
+ticker = "NVDA"
+data = yf.download(ticker, start="2024-01-01")
+
+window = 20                                   # Calculates the bands
+std_dev_factor = 2                            
+data['SMA'] = data['Close'].rolling(window=sma_window_length).mean()
+rolling_std = data['Close'].rolling(window=sma_window_length).std()
+data['rf'] = (rolling_std * std_dev_factor)
+data['upper'] =  data['SMA'] + data['rf']
+data['lower'] =  data['SMA'] - data['rf']
+
+plt.figure(figsize=(12, 6))
+plt.plot(data.index, data['Close'], label="Close Price", color="blue", linewidth=1)
+plt.plot(data.index, data['SMA'], label=f"{window}-Day SMA", color="orange", linewidth=1.5)
+plt.plot(data.index, data['upper'], label="Upper Bollinger Band", color="green", linestyle="--", linewidth=1)
+plt.plot(data.index, data['lower'], label="Lower Bollinger Band", color="red", linestyle="--", linewidth=1)
+
+plt.title(f"Bollinger Bands for {ticker} (20-day window)", fontsize=14)
+plt.xlabel("Date", fontsize=12)
+plt.ylabel("Price", fontsize=12)
+plt.legend()
+plt.grid(alpha=0.3)
+plt.show()
+```
+
+### page 291
+Listing 10.7 Displaying returns with Streamlit 
+```
+import streamlit as st
+import pandas as pd
+import yfinance as yf
+
+st.title("Finance Dashboard")
+tickers = ('TSLA', 'AAPL', 'MSFT', 'ETH-USD', 'BTC-USD')
+dropdown = st.multiselect("Select Ticker", tickers)
+start = st.date_input('Start Date', pd.to_datetime('2024-01-01'))
+end = st.date_input('End Date', pd.to_datetime('today'))
+
+def relativeret(df):
+    rel = df.pct_change()
+    cumret = (1+rel).cumprod() -1
+    cumret = cumret.fillna(0)
+    return cumret
+
+if len (dropdown) > 0:
+    df = relativeret(yf.download(dropdown, start=start, end=end))['Close']
+    st.header(f"Returns of {dropdown}")
+    st.line_chart(df)
+```
+
+
+# Chapter 11: Algorithmic trading
 ### [top](#table-of-contents)
+
+###  Quantitative analysis
+Every company has quarterly earnings calls, during which executives discuss the past quarter. Depending on the company, stocks can move quite a lot.
+
+
+###  Testing strategies using backtesting
+Backtesting evaluates trading strategies using historical data.
+- A simple moving average (SMA) crossover can serve as a buy or sell signal. This strategy involves calculating two SMAs with different time windows based on a stock’s closing price:
+  - When the shorter-period SMA crosses above the longer-period SMA, it signals a buy.
+  - When it crosses below, it signals a sell.
+```
+def add_sma(df: pd.DataFrame, lower: int, upper: int) -> pd.DataFrame:
+    if f'sma_{lower}' not in df.columns:
+        df[f'sma_{lower}'] = df.Close.rolling(lower).mean()
+    if f'sma_{upper}' not in df.columns:
+        df[f'sma_{upper}']  = df.Close.rolling(upper).mean()
+    return df
+```
+
+Listing 11.1 Backtest
+```
+def backtest(df: pd.DataFrame, lower: int, upper: int, shares : int, buy_first_day = False) -> pd.DataFrame:
+    schema={'date': 'datetime64[ns]', 'action': 'str', 'cash_movement': 'float64'}
+    results = pd.DataFrame(columns=schema.keys()).astype(schema)
+
+    if buy_first_day:
+        results.loc[len(results)] = [df["Date"].iloc[0], "Buy", df["Close"].iloc[0] * shares * -1]
+        waiting_for_bear = True
+    else:
+        waiting_for_bear = False
+
+    for index, row in df.iterrows():
+        if not waiting_for_bear:
+            if row[f"sma_{lower}"] > row[f"sma_{upper}"]:
+                results.loc[len(results)] = [row.Date, "Buy", row.Close * shares * -1]
+                waiting_for_bear = True
+        else:
+            if row[f"sma_{lower}"] < row[f"sma_{upper}"]:
+                results.loc[len(results)] = [row.Date, "Sell", row.Close * shares]
+                waiting_for_bear = False
+
+    if waiting_for_bear:
+        results.loc[len(results)] = [df["Date"].iloc[-1], "Sell", df["Close"].iloc[-1] * shares]
+
+    return results
+```
+
+We’ll execute a test for NVIDIA using $1,000 and calculate 10 years of data.
+
+In this first test scenario below, we take 10 trading days for a lower SMA window and 20 trading days for the upper time window.
+
+Listing 11.2 Executing a single backtest
+```
+def run_single_backtest(ticker: str, cash, start_date: str, end_date: str, transaction_costs = 1) -> pd.DataFrame:
+    df = load_data(ticker, start_date, end_date)
+    shares = round(cash / df["Close"][0])
+    print(f"Shares: {shares}. start price: {df["Close"][0]}. end price: "
+          f"{df["Close"].iloc[-1]}. to beat: {df["Close"].iloc[-1]*shares – df["Close"][0]*shares – transaction_costs}")
+    df = add_sma(df, 10, 20)
+    res = backtest(df, 10, 20, shares, True)
+    gain = res['cash_movement'].sum()
+    gain = gain - transaction_costs * len(res['cash_movement'])
+    print(f"Gains: {gain})")
+    return df
+
+results_nvda = run_single_backtest("NVDA", 1000, "2015-01-01", "2025-01-01")
+```
+
+Listing 11.3 Executing multiple backtests
+```
+def run_multiple_backtests(ticker, investment_sum = 1000):
+    schema={'lower': 'int64', 'upper': 'int64', 'gain': 'float64'}
+    results = pd.DataFrame(columns=schema.keys()).astype(schema)
+    df = load_data(ticker, start_date)
+    shares = round(investment_sum / df["Close"][0])
+    print(f"Shares: {shares}. start price: {df["Close"][0]}. end price: "
+          f"{df["Close"].iloc[-1]}. to beat: {df["Close"].iloc[-1]*shares – df["Close"][0]*shares}")
+    for n,m in test_params.values:
+        df = add_sma(df, n, m)
+        res = backtest(df, n, m, shares)
+        gain = res['change'].sum()
+        results.loc[len(results)] = [n, m, gain]
+    sorted_results = results.sort_values(by='gain', ascending=False)
+    return sorted_results
+
+ticker = "NVDA"
+res_nvda = run_multiple_backtests(ticker, investment_sum = 1000)
+res_nvda
+```
+
+###  Catalysts as game changers
+###  The difference between exchanges and brokers
+###  Executing orders with Python
+###  Order types and modalities
+
+
+# Chapter 12: Private equity: Investing in start-ups
+### [top](#table-of-contents)
+
+> Don’t mistake pre-seed start-ups for lottery tickets.
+It's vital for a startup in this stage to create a minimum viable product (MVP) to validate the ideas.
+
+Incubators aren’t free to run. They require funding, which can come from multiple sources:
+-  Government grants and public funding—Governments often provide financing for incubators to stimulate innovation.
+-  Corporate sponsorships—Large companies sponsor incubators to stay close to innovation.
+-  Universities and research institutions—Many incubators are affiliated with universities, helping students commercialize their research.
+-  Venture capitalists and angel investors—Some incubators are backed by investors looking for early-stage deal flow.
+-  Membership and service fees—Some incubators charge start-ups for participation.
+-  Equity stakes—Many incubators take a small equity percentage in exchange for resources.
+
+
+? Start-ups can raise multiple funding rounds at each stage of development. They can raise money through debt (borrowing money) or equity (selling ownership).
+Raising money through equity leads to dilution: preexisting owners will own fewer shares after an investment round unless they participate in the investment round themselves.
+
+
+### page 339
+Listing 12.2 Calculating dilution
+```
+import pandas as pd
+total_shares = 1_000_000            
+founder_shares = 500_000          
+
+# Sets parameters ownership details, funding rounds
+funding_rounds = [
+    ("Seed", 500_000, 25),          
+    ("Series A", 2_000_000, 20),    
+    ("Series B", 10_000_000, 15),   
+    ("Series C", 50_000_000, 10)    
+]
+dilution_data = []
+for round_name, investment, equity_given in funding_rounds:
+    new_shares = (total_shares * 
+                 (equity_given / 
+                  (100 - equity_given)))
+
+    # Calculates dilution
+    total_shares += new_shares
+    founder_ownership = (founder_shares / total_shares) * 100
+    dilution_data.append([round_name, 
+                          investment, 
+                          int(total_shares), 
+                          round(founder_ownership, 2)])     
+
+df = pd.DataFrame(dilution_data, columns=["Round", "Investment ($)", "Total Shares", "Founder Ownership (%)"])
+df
+```
+
+
+# Chapter 13: The road goes ever on and on
+### [top](#table-of-contents)
+
+### Summary
+-  Seeking advice before making significant investments is almost always a wise decision.
+-  Discussing potential investments with a friend and charging clients for your advice are distinct actions. For the latter, you likely need a business license.
+-  Staying curious about businesses is one way to accumulate a wealth of knowledge, enabling sound investment decisions over time.
+-  Becoming a digital nomad enables you to pick countries with favorable tax conditions. Some countries may not have taxes on capital appreciation.
+-  Become aware that your investment also supports a company. Sometimes, you might not want to support specific companies, even if you might benefit financially.
+-  The smaller the company, the more effect your investment has.
+-  You can become your own most significant obstacle to getting rich if you act irrationally. Establish checks and balances to minimize the effect of strong emotions.
+-  You can document every investment decision and then later use a retrospective to find potential learnings to improve your investment process.
+-  Occasionally, it helps to take a step back and reevaluate situations with a clear mind.
+-  Many investors claim that new investors are best off with an index or world fund.
+-  Patience and a stoic mindset may be the key ingredients to achieving wealth in the long run.
+
+
+# Appendix A
+### [top](#table-of-contents)
+
+Table A.1 Python libraries used in this book
+
+| Library | Link | Key required |
+|---------|------|--------------|
+|python-dotenv | https://pypi.org/project/python-dotenv/ | No |
+|yfinance | https://pypi.org/project/yfinance/ | No |
+|pandas | https://pypi.org/project/pandas/ | No |
+|NumPy | https://pypi.org/project/numpy/ | No |
+|matplotlib | https://pypi.org/project/matplotlib/ | No |
+|finviz | https://pypi.org/project/finviz/ | Yes |
+|openbb | https://pypi.org/project/openbb/ | Yes |
+|alpha-vantage | https://pypi.org/project/alpha-vantage/ | Yes |
+|eodhd | https://pypi.org/project/eodhd/ | Yes |
+|pytrends | https://pypi.org/project/pytrends/ | No |
+|Alpaca-py | https://pypi.org/project/alpaca-py/ | Yes |
+|ib_insync | https://pypi.org/project/ib-insync/ | No |
+|python_binance | https://pypi.org/project/python-binance/ | Yes |
+|SQLAlchemy | https://pypi.org/project/SQLAlchemy/ | No |
+|CurrencyConverter | https://pypi.org/project/CurrencyConverter/ | No |
+|scikit-learn | https://pypi.org/project/scikit-learn/ | No |
+|statsmodels | https://pypi.org/project/statsmodels/ | No |
+|openai | https://pypi.org/project/openai/ | Yes |
+|google-genai | https://pypi.org/project/google-genai/ | Yes |
+|google-generativeai | https://pypi.org/project/google-generativeai/ | Yes |
+|anthropic | https://pypi.org/project/anthropic/ | Yes |
+|transformers | https://pypi.org/project/transformers/ | No |
+|langchain | https://pypi.org/project/langchain/ | No |
+|Langchain-community | https://pypi.org/project/langchain-community/ | No |
+|Langchain-openai | https://pypi.org/project/langchain-openai/ | Yes |
+|Langchain-core | https://pypi.org/project/langchain-core/ | No |
+|mplfinance | https://pypi.org/project/mplfinance/ | No |
+|streamlit | https://pypi.org/project/streamlit/ | No |
