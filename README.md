@@ -18,11 +18,11 @@
 ## Books on Python
 
 * [Addison-Wesley Python Distilled (Developers Library), 2021](Addison-Wesley-Python-Distilled_Developers_Library_2021.md)
-* [Advanced Python Tips - A Simple Book on Advanced Python concepts, 2020](Advanced-Python-Tips-A-Simple-Book-on-Advanced-Python-concepts-2020.md)
+* [Advanced Python Tips: A Simple Book on Advanced Python concepts, 2020](Advanced-Python-Tips-A-Simple-Book-on-Advanced-Python-concepts-2020.md)
 * [Apress Python Data Analytics With Pandas, NumPy, and Matplotlib 3rd Edition, 2023](Apress-Python-Data-Analytics-With-Pandas-NumPy-and-Matplotlib-3rd-Edition-2023.md)
 
 ## Books on Software Security
-* [Cracking the Code - Reverse Engineering Software Protections (The Ultimate Reverse Engineering Guide From Beginner to Expert),  2025](Cracking-the-Code-Reverse-Engineering-Software-Protections_The-Ultimate-Reverse-Engineering-Guide-From-Beginner-to-Expert_2025.md)
+* [Cracking the Code: Reverse Engineering Software Protections (The Ultimate Reverse Engineering Guide From Beginner to Expert),  2025](Cracking-the-Code-Reverse-Engineering-Software-Protections_The-Ultimate-Reverse-Engineering-Guide-From-Beginner-to-Expert_2025.md)
 
 ## Books on Everything Else
-* [Manning Investing for Programmers - : Understanding markets through data and code, 2025](Manning-Investing-for-Programmers-2025.md)
+* [Manning Investing for Programmers: Understanding markets through data and code, 2025](Manning-Investing-for-Programmers-2025.md)
