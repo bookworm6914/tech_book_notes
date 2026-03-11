@@ -39,7 +39,7 @@
 - [Chapter 13: The road goes ever on and on](#chapter-13-the-road-goes-ever-on-and-on)
 - [Appendix A](#appendix-a)
 
-**liveBook discussion forum**        https://livebook.manning.com/book/investing-for-programmers/discussion
+**Live Book discussion forum**        https://livebook.manning.com/book/investing-for-programmers/discussion
 
 
 # Chapter 1: The analytical investor
