@@ -14,6 +14,7 @@
 ## Books on DevOps
 
 * [Quick Start Kubernetes 2025 Edition](Quick-Start-Kubernetes-2025-Edition.md)
+* [Docker Deep Dive - Zero to Docker in a single book, 2025](Docker-Deep-Dive-Zero-to-Docker-in-a-single-book-2025.md)
 
 ## Books on Python
 

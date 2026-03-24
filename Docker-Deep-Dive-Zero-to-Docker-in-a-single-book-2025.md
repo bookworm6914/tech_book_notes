@@ -1,0 +1,1164 @@
+<p align="center"> 
+<img src="Docker-Deep-Dive-Zero-to-Docker-in-a-single-book-2025.png">
+</p>
+
+# Docker Deep Dive - Zero to Docker in a single book 2025
+## Written by Nigel Poulton, 2025
+- [**Amazon URL**](https://www.amazon.com/Docker-Deep-Dive-Nigel-Poulton-ebook/dp/B01LXWQUFF/)
+- [**Original Books Notes**](Docker-Deep-Dive-Zero-to-Docker-in-a-single-book-2025.txt)
+- Author's Info
+  - • LinkedIn: Nigel Poulton   https://linkedin.com/in/nigelpoulton
+  - • Web: https://nigelpoulton.com
+  - • BlueSky: https://bsky.app/profile/nigelpoulton.bsky.social
+  - • X: https://twitter.com/nigelpoulton
+  - • Email: ddd@nigelpoulton.com
+
+
+## Table of Contents
+- [Chapter 1: Containers from 30,000 feet](#chapter-1-containers-from-30000-feet)
+- [Chapter 2: Docker and container-related standards and projects](#chapter-2-docker-and-container-related-standards-and-projects)
+- [Chapter 3: Getting Docker](#chapter-3-getting-docker)
+- [Chapter 4: The big picture](#chapter-4-the-big-picture)
+- [Chapter 5: The Docker Engine](#chapter-5-the-docker-engine)
+- [Chapter 6: Working with Images](#chapter-6-working-with-images)
+- [Chapter 7: Working with containers](#chapter-7-working-with-containers)
+- [Chapter 8: Containerizing an app](#chapter-8-containerizing-an-app)
+- [Chapter 9: Multi-container apps with Compose](#chapter-9-multi-container-apps-with-compose)
+- [Chapter 10: Docker and Wasm](#chapter-10-docker-and-wasm)
+- [Chapter 11: Docker Swarm](#chapter-11-docker-swarm)
+- [Chapter 12: Deploying apps to Swarm](#chapter-12-deploying-apps-to-swarm)
+- [Chapter 13: Docker Networking](#chapter-13-docker-networking)
+- [Chapter 14: Docker overlay networking](#chapter-14-docker-overlay-networking)
+- [Chapter 15: Volumes and persistent data](#chapter-15-volumes-and-persistent-data)
+- [Chapter 16: Docker security](#chapter-16-docker-security)
+
+
+# Chapter 1: Containers from 30,000 feet
+### [top](#table-of-contents)
+
+Virtual Machines (VM) are heavy-weighted, that
+• Every OS consumes CPU, RAM, and other resources we’d rather use on applications
+• Every VM and OS needs patching
+• Every VM and OS needs monitoring
+
+VMs are also slow to boot and not very portable.
+
+> Containers then comes out as a light-weighted solution for virtualization. While it is still complicated till Docker shows up.
+Docker was the magic that made Linux containers easy and brought them to the masses. 
+
+Windows desktop and server platforms support both
+- • Windows containers
+- • Linux containers
+
+Windows containers run Windows apps and require a host system with a Windows kernel.
+Windows 10, Windows 11, and all modern versions of Windows Server natively support Windows containers.
+
+Windows systems can also run Linux containers via the WSL 2 (Windows Subsystem for Linux) subsystem.
+The Linux process is named a pico process on Windows host.
+
+Almost all containers are Linux containers. This is because Linux containers are smaller and faster, and more tooling exists for Linux.
+
+There is no Mac containers. We can run and manage Linux containers on Mac via Docker Desktop.
+
+Docker supports NVIDIA GPUs. In the future, we should expect Docker to support other GPUs, TPUs, NPUs, and even WebGPU.
+
+Kubernetes is the industry standard platform for deploying and managing containerized apps. All Docker containers work on Kubernetes.
+
+
+
+# Chapter 2: Docker and container-related standards and projects
+### [top](#table-of-contents)
+
+At a high level, there are two major parts to the Docker platform:
+- • The CLI (client)
+- • The engine (server)
+
+Several important standards and governance bodies influence container development and the container ecosystem, include:
+- • The OCI
+  - The **Open Container Initiative** (`OCI`) is a governance council responsible for low-level container-related standards.
+    - https://www.opencontainers.org/
+    - The OCI maintains three standards called specs:
+      - • The image-spec        https://github.com/opencontainers/image-spec
+      - • The runtime-spec      https://github.com/opencontainers/runtime-spec
+      - • The distribution-spec https://github.com/opencontainers/distribution-spec
+
+- • The CNCF
+  - The Cloud Native Computing Foundation (CNCF) is another Linux Foundation project that is influential in the container ecosystem.
+  - https://www.cncf.io/
+  - Instead of creating and maintaining container-related specifications, the CNCF hosts important projects such as Kubernetes, containerd, Notary, Prometheus, Cilium, and lots more.
+  - All CNCF projects pass through the following three phases or stages:
+    - • Sandbox
+    - • Incubating
+    - • Graduated
+    - Each phase increases a project’s maturity level by requiring higher standards of governance, documentation, auditing, contribution tracking, marketing, community engagement, and more.
+    - Graduated projects are considered ready for production and are guaranteed to have strong governance and implement good practices.
+
+  > Docker uses at least two CNCF technologies — containerd and Notary.
+
+- • The Moby Project
+  - Docker created the Moby project as a community-led place for developers to build specialized tools for building container platforms.
+  - Platform builders can pick the specific Moby tools they need to build their container platform.
+  - They can even compose their platforms using a mix of Moby tools, in-house tools, and tools from other projects.
+
+
+# Chapter 3: Getting Docker
+### [top](#table-of-contents)
+
+#### • Docker Desktop (author recommends)
+- It’s free for personal use and education.
+  - Docker Desktop on Windows requires all of the following:
+    - • 64-bit version of Windows 10/11
+    - • Hardware virtualization support must be enabled in your system’s BIOS
+    - • WSL 2
+
+  - Installing Docker Desktop on Mac is relatively simple.
+
+#### • Multipass
+- Only consider this if you can’t use Docker Desktop.
+- Multipass is a free tool for creating cloud-style Linux VMs on your Linux, Mac, or Windows machine and is incredibly easy to install and use.
+- It’s an easy way to create multi-node production-like Docker clusters.
+- Multipass installations don’t ship with out-of-the-box support for features such as docker scout , docker debug , and docker init.
+  - • Go to https://multipass.run/install and install the right edition for your hardware and OS.
+  - • Once installed, you only need three commands:
+```
+$ multipass launch
+$ multipass ls
+$ multipass shell
+```
+  - • Run the following command to create a new VM called node1 based on the docker image.
+```
+$ multipass launch docker --name node1
+$ multipass ls
+$ multipass shell node1         # connect to the container
+    # inside the container, we can use all docker related commands
+$ multipass delete node1
+$ multipass purge
+```
+#### • Server installation on Linux
+```
+$ sudo snap install docker
+$ sudo docker --version
+$ sudo groupadd docker
+$ sudo usermod -aG docker $(whoami)
+$ sudo service docker start
+```
+
+
+# Chapter 4: The big picture
+### [top](#table-of-contents)
+
+- The Ops perspective
+  - • Check Docker is working
+```
+$ docker version
+```
+- • Download an image
+```
+$ docker images
+$ docker pull nginx:latest
+$ docker images
+```
+- • Start a container from the image
+```
+$ docker run --name test -d -p 8080:80 nginx:latest
+$ docker ps
+```
+- • Execute a command inside the container
+```
+$ docker exec -it test bash
+(enters the bash shell of the container)
+root@e08c35352ff3:/# ls -l
+
+root@e08c35352ff3:/# ps -elf
+bash: ps: command not found     <-- because most containers only ship with essential apps and tools to keep them small and reduce attack vectors
+
+root@e08c35352ff3:/# exit
+$ docker ps
+```
+- • Delete the container
+```
+$ docker stop test
+$ docker rm test
+```
+- The Dev perspective
+  - • Clone an app from a GitHub repo
+```
+$ git clone https://github.com/nigelpoulton/psweb.git
+$ cd psweb
+```
+  - • Inspect the app’s Dockerfile
+```
+$ cat Dockerfile
+
+FROM alpine
+LABEL maintainer="nigelpoulton@hotmail.com"
+RUN apk add --update nodejs npm curl
+COPY . /src
+WORKDIR /src
+RUN npm install
+EXPOSE 8080
+ENTRYPOINT ["node", "./app.js"]
+```
+  - • Containerize the app
+```
+$ docker build -t test:latest .
+$ docker images
+```
+  - • Run the app as a container
+```
+$ docker run -d \
+    --name web1 \
+    --publish 8080:8080 \
+    test:latest
+```
+  - • Clean up
+```
+$ docker rm web1 -f
+$ docker rmi test:latest
+```
+
+
+# Chapter 5: The Docker Engine
+### [top](#table-of-contents)
+
+#### Docker Engine – The TLDR
+
+##### page 68
+**Diagram of the Docker Engine components that create and run containers**
+<p align="center"> 
+<img src="Docker-Deep-Dive-Zero-to-Docker-in-a-single-book-2025-Figure5.1-docker-engine-components.png">
+</p>
+
+#### The Docker Engine
+The Docker Engine had two major components:
+- • The Docker daemon (sometimes referred to as just “the daemon”)
+- • LXC
+
+>The daemon was a monolithic binary containing all the code for the API, image builders, container execution, volumes, networking, and more.
+LXC did the hard work of interfacing with the Linux kernel and constructing the required namespaces and cgroups to build and start containers.
+
+#### The influence of the Open Container Initiative (OCI)
+Libcontainer replaced LXC in Docker later on to match the speed of docker evolution.
+
+#### page 71
+**diagram of the latest Docker Engine components, with runc and containerd**
+<p align="center"> 
+<img src="Docker-Deep-Dive-Zero-to-Docker-in-a-single-book-2025-Figure5.2-latest-docker-engine.png">
+</p>
+
+- runc
+>runc is a lightweight CLI wrapper for libcontainer that you can download and use to manage OCI-compliant containers.
+Docker and Kubernetes both use runc as their default low-level runtime, and both pair it with the containerd high-level runtime.
+  - • containerd operates as the high-level runtime managing lifecycle events.
+  - • runc operates as the low-level runtime executing lifecycle events by interfacing with the kernel to do the work of actually building containers and deleting them.
+  - https://github.com/opencontainers/runc/releases
+- 
+- containerd
+  - https://github.com/containerd/containerd/releases
+
+#### Starting a new container (example)
+```
+$ docker run -d --name ctr1 nginx
+$ docker ps
+```
+The daemon can expose the API on a local socket or over the network.
+- On Linux, the local socket is `/var/run/docker.sock`
+- On Windows it’s `\pipe\docker_engine`
+
+The daemon receives the request, interprets it as a request to create a new container, and passes it to containerd.
+Remember that the daemon no longer contains any code to create containers.
+
+The daemon communicates with containerd via a CRUD-style API over gRPC (https://grpc.io/)
+
+Despite its name, even containerd cannot create containers. It converts the required Docker image into an OCI bundle and tells runc to use this to create a new container.
+
+runc interfaces with the OS kernel to pull together all the constructs necessary to create a container (namespaces, cgroups, etc.).
+The container starts as a child process of runc, and as soon as the container starts, runc exits.
+
+#### What’s the shim all about
+Shims are a popular software engineering pattern, and the Docker Engine uses them in between containerd and the OCI layer, bringing the benefits of
+- • Daemonless containers
+- • Improved efficiency
+- • Pluggable OCI layer
+
+Shims also make it possible to replace runc with other low-level runtimes.
+
+##### How it’s implemented on Linux
+On a Linux system, Docker implements the components we’ve discussed as the following separate binaries:
+- • `/usr/bin/dockerd` (the Docker daemon)
+- • `/usr/bin/containerd`
+- • `/usr/bin/containerd-shim-runc-v2`
+- • `/usr/bin/runc`
+
+
+
+# Chapter 6: Working with Images
+### [top](#table-of-contents)
+
+### Docker images – The TLDR
+An image is a read-only package containing everything you need to run an application. This means they include application code, dependencies, a minimal set of OS constructs, and metadata.
+You can start multiple containers from a single image.
+
+The easiest way to get an image is to pull one from a registry.
+
+Docker Hub is the most common registry, and pulling an image downloads it to your local machine where Docker can use it to start one or more containers.
+Other registries exist, and Docker works with them all.
+
+Docker creates images by stacking independent layers and representing them as a single unified object.
+
+One layer might have the OS components, another layer might have application dependencies, and another layer might have the application.
+Docker stacks these layers and makes them look like a unified system.
+
+### Intro to images
+Images are build-time constructs, whereas containers are runtime constructs.
+
+Containers are designed to run a single application or microservice.
+
+Another thing that keeps images small is the lack of an OS kernel. This is because containers use the kernel of the host they’re running on.
+
+### Pulling images
+```
+$ docker pull <registry>:<repo name>/<path>/<image name>:<image tag or version>
+$ docker pull redis:latest
+```
+### Image registries
+> Most modern registries implement the OCI distribution-spec, and we sometimes call them OCI registries.
+Most registries also implement the Docker Registry v2 API, meaning you can use the Docker CLI and other API tools to query them and work with them in standard ways.
+Some offer advanced features such as image scanning and integration with build pipelines.
+
+Image registries contain one or more image repositories, and image repositories contain one or more images.
+
+### Image naming and tagging
+You can give a single image as many tags as you want.
+
+### Images and layers
+Use these commands to check the image and related layers
+```
+$ docker inspect
+$ docker history
+$ docker manifest inspect 
+```
+
+### Pulling images by digest
+Docker uses a content addressable storage model where every image gets a cryptographic content hash that we usually call the digest. 
+```
+$ docker images --digests alpine
+
+$ docker buildx imagetools inspect nigelpoulton/k8sbook:latest
+# pull an image by its digest
+$ docker pull nigelpoulton/k8sbook@sha256:13dd59a0...bce2e14b
+# to query the registry API on an image's digest
+$ curl "https://hub.docker.com/v2/repositories/nigelpoulton/k8sbook@sha256:13dd59a0...bce2e14b" |jq '.results[].digest'
+```
+
+### Multi-architecture images
+```
+$ docker buildx imagetools inspect alpine
+$ docker manifest inspect golang | grep 'architecture\|os'
+
+$ docker buildx build \
+    --builder=cloud-nigelpoulton-ddd-cloud \
+    --platform=linux/amd64,linux/arm64 \
+    -t nigelpoulton/tu-demo:latest --push .
+
+• Vulnerability scanning with Docker Scout
+$ docker scout quickview nigelpoulton/tu-demo:latest
+$ docker scout cves nigelpoulton/tu-demo:latest
+```
+
+### Deleting images
+```
+$ docker rmi redis:latest af111729d35a sha256:c5b1261d...f8e1ad6
+# to delete all local images
+$ docker rmi $(docker images -q) -f
+```
+
+
+# Chapter 7: Working with containers
+### [top](#table-of-contents)
+
+### Container – The TLDR
+You can `start`, `stop`, `restart`, and `delete` containers just like you can with VMs. However, containers are smaller, faster, and more portable than VMs.
+They’re also designed to be stateless and ephemeral, whereas VMs are designed to be long-running and can be migrated with their state and data.
+
+Containers are also designed to be immutable. This means you shouldn’t change them after you’ve deployed them — if a containerfails, you replace it with a new one instead of connecting to it and making a live fix.
+
+### Containers vs VMs
+Differences between containers and VMs:
+- VMs virtualize hardware
+- Containers virtualize operating systems
+
+Besides,
+- Containers are smaller and more portable
+- You can run more containers on your infrastructure
+- Containers start faster
+- Containers reduce the number of operating systems you need to manage (patch, update, etc.)
+- Containers present a smaller attack surface
+
+### Images and containers
+We can start multiple containers from a single image. The image is read-only in this relationship, but each container is read-write.
+Docker accomplishes this by creating a thin read-write layer for each container and placing it on top of the shared image.
+
+• Check Docker is running
+```
+$ docker version
+
+# Linux systems not using Systemd
+$ service docker status
+
+# Linux systems using Systemd
+$ systemctl is-active docker
+```
+• Starting a container
+```
+# docker run <arguments> <image> <command>
+$ docker run -d --name webserver -p 5005:8080 nigelpoulton/ddd-book:web0.1
+
+$ docker images
+$ docker ps
+```
+
+### How containers start apps
+There are three ways you can tell Docker how to start an app in a container:
+- 1. An Entrypoint instruction in the image
+- 2. A Cmd instruction in the image
+- 3. A CLI argument
+```
+$ docker inspect nigelpoulton/ddd-book:web0.1 | grep Entrypoint
+```
+
+### Connecting to a running container
+Use the docker exec command to execute commands in running containers, and it has two modes:
+- Interactive
+- Remote execution
+
+Interactive exec sessions connect your terminal to a shell process in the container and behave like remote SSH sessions.
+```
+$ docker exec -it webserver sh
+```
+Remote execution mode lets you send commands to a running container and prints the output to your local terminal.
+
+### Inspecting container processes
+```
+# in the container'a shell
+$ ps
+```
+
+### The docker inspect command
+```
+$ docker inspect <image name>
+$ docker inspect <container tag or digest>
+```
+
+### Writing data to a container
+When creating one container, maps one of its virtual path A to a host's path B, so writing to the folder A will be saved in folder B.
+
+### Stopping, restarting, and deleting a container
+```
+$ docker stop <container name>
+$ docker restart <container tag>
+$ docker rm <container name> -f
+$ docker ps -a
+```
+
+### Killing a container’s main process
+```
+$ docker attach <container name>
+```
+
+### Debugging slim images and containers with Docker Debug
+```
+$ docker attach <container name>
+# in the container's shell, type Ctrl PQ to gracefully disconnect from the container without killing the Bash process.
+
+# Run the following command to check if you have the Docker Debug CLI plugin.
+$ docker info
+$ docker debug <image>|<container>
+```
+
+### Self-healing containers with restart policies
+Docker supports the following four policies:
+
+| Restart policy | Non-zero exit code | Zero exit code | docker stop command | Restart when daemon restarts |
+|----------------|--------------------|----------------|---------------------|------------------------------|
+| no (default) | N | N | N | N |
+| on-failure | Y | N | N | Y |
+| always | Y | Y | N | Y |
+| unless-stopped | Y | Y | N | N |
+
+
+# Chapter 8: Containerizing an app
+### [top](#table-of-contents)
+
+### Containerizing an app – The TLDR
+- 1. Write your applications and create the list of dependencies
+- 2. Create a Dockerfile that tells Docker how to build and run the app
+- 3. Build the app into an image
+- 4. Push the image to a registry (optional)
+- 5. Run a container from the image
+
+### Containerize a single-container app
+```
+$ git clone https://github.com/nigelpoulton/ddd-book.git
+$ docker init
+Welcome to the Docker Init CLI!
+...
+CREATED: .dockerignore
+CREATED: Dockerfile
+CREATED: compose.yaml
+CREATED: README.Docker.md
+```
+Sample dockerfile:
+```
+ARG NODE_VERSION=20.8.0
+FROM node:${NODE_VERSION}-alpine
+ENV NODE_ENV production
+WORKDIR /usr/src/app
+RUN --mount=type=bind,source=package.json,target=package.json
+    --mount=type=bind,source=package-lock.json,target=package-lo
+    --mount=type=cache,target=/root/.npm \
+    npm ci --omit=dev
+USER node
+COPY . .
+EXPOSE 8080
+CMD node app.js
+```
+```
+$ docker build -t ddd-book:ch8.node .
+$ docker images
+$ docker inspect ddd-book:ch8.node
+```
+To push the image to Docker Hub:
+- 1. Login to Docker Hub
+- 2. Re-tag the image
+- 3. Push the image
+```
+$ docker login
+$ docker tag ddd-book:ch8.node nigelpoulton/ddd-book:ch8.node
+$ docker images
+$ docker push nigelpoulton/ddd-book:ch8.node
+$ docker run -d --name c1 \
+    -p 5005:8080 \
+    nigelpoulton/ddd-book:ch8.node
+```
+
+### Moving to production with multi-stage-builds
+A sample dockerfile:
+```
+FROM golang:1.23.4-alpine AS base           <<---- Stage 0
+WORKDIR /src
+COPY go.mod go.sum .
+RUN go mod download
+COPY . .
+
+FROM base AS build-client                   <<---- Stage 1
+RUN go build -o /bin/client ./cmd/client
+
+FROM base AS build-server                   <<---- Stage 2
+RUN go build -o /bin/server ./cmd/server
+
+FROM scratch AS prod                        <<---- Stage 3
+COPY --from=build-client /bin/client /bin/
+COPY --from=build-server /bin/server /bin/
+ENTRYPOINT [ "/bin/server" ]
+```
+
+### Buildx, BuildKit, drivers, and Build Cloud
+Behind the scenes, Docker’s build system has a client and server:
+- Client: Buildx
+- Server: BuildKit
+
+### Multi-architecture builds
+- list current local buiders
+```
+$ docker buildx ls
+$ docker buildx create --driver=docker-container --name=container-test
+$ docker buildx use container-test
+```
+- If you don’t have a Docker Hub account or don’t want to push the images, you can replace the --push with --load
+```
+$ docker buildx build --builder=container-test \
+    --platform=linux/amd64,linux/arm64 \
+    -t nigelpoulton/ddd-book:ch8.1 --push .
+```
+
+### A few good practices
+You can force a build to ignore the cache by running docker build with the --no-cache option.
+
+COPY vs. ADD instructions
+
+Only install essential packages
+
+
+
+# Chapter 9: Multi-container apps with Compose
+### [top](#table-of-contents)
+
+### Compose – The TLDR
+Another way of container orchestration, something like Kubernetes / k8s
+
+### Compose background
+Use the fig command-line tool to manage the entire application lifecycle.
+
+fig was renamed to docker-compose later, and Docker Corp. incorporate the features to "docker compose" sub-command.
+
+### Install Compose
+All modern versions of Docker come with Docker Compose preinstalled, and you no longer need to install it as a separate application.
+```
+$ docker compose version
+```
+
+### The AI chatbot app
+```
+$ git clone https://github.com/nigelpoulton/ddd-book.git
+```
+
+### Compose files
+The compose.yaml or compose.yml file defines these blocks on volumes, networks and services.
+
+### Deploy the app
+```
+$ docker compose up
+$ docker compose -f ./llm/chatbot.yaml up
+```
+
+### Use the app
+Check http://localhost:3000 on your browser
+
+### Inspect the app
+```
+$ docker images
+$ docker ps
+$ docker network ps
+$ docker volume ps
+```
+
+### Manage the app
+```
+$ docker compose ls
+$ docker compose down
+$ docker volume ls
+```
+
+### Inspect the Ollama configuration
+```
+$ docker exec -it ai-compose-model-1 sh
+#
+# ollama --version
+ollama version is 0.5.4-0-g2ddc32d-dirty
+$ ps -ef
+```
+
+### clean up
+```
+$ docker compose down --volumes --rmi all
+```
+
+This chapter is skipped as I'm not interested in `Docker Compose`. It's not popular as k8s.
+
+
+
+# Chapter 10: Docker and Wasm
+### [top](#table-of-contents)
+
+### Pre-reqs
+* Docker Desktop 4.37+ with Wasm enabled
+* Rust 1.82+ with the Wasm target installed
+* Spin 3.1+
+
+Open the Docker Desktop UI, click the Settings icon at the top right, and make sure Use containerd for pulling and storing images is selected on the General tab.
+Next, click the Features in development tab, select the Enable Wasm option and click the blue Apply & restart button.
+
+Install Rust first, then
+```
+$ rustup target add wasm32-wasip1
+```
+Spin is a Wasm framework and runtime that makes building and running Wasm apps easy. Install it first, then
+```
+$ spin --version
+```
+### Intro to Wasm
+```
+$ docker run --rm -i --privileged --pid=host jorgeprendes420/doc
+```
+
+### Write a Wasm app
+```
+$ spin new hello-world -t http-rust
+$ cd hello-world
+$ tree
+```
+Edit the src/lib.rs file:
+```
+	use spin_sdk::http::{IntoResponse, Request, Response};
+	<Snip>
+		Ok(http::Response::builder().status(200)
+		.header("content-type", "text/plain")
+		.body("Docker loves Wasm")?) 				<<---- Change to this line
+		.build())
+	}
+```
+```
+$ spin build
+$ tree
+<Snip>
+└──target
+	└──wasm32-wasip1
+		└──release
+			└──hello_world.wasm
+```
+```
+$ spin up
+Logging component stdio to ".spin/logs/"
+Serving http://127.0.0.1:3000
+Available Routes:
+	hello-world: http://127.0.0.1:3000/hello
+```
+Point your browser to http://127.0.0.1:3000/hello and make sure the app works.
+
+Press Ctrl-C to kill the app.
+
+### Containerize a Wasm app
+Dockerfile:
+```
+FROM scratch
+COPY /target/wasm32-wasip1/release/hello_world.wasm .
+COPY spin.toml .
+```
+
+```
+$ docker build \
+	--platform wasi/wasm \
+	--provenance=false \
+	-t nigelpoulton/ddd-book:wasm .
+
+$ docker push nigelpoulton/ddd-book:wasm
+```
+
+### Deploy a Wasm app
+```
+$ docker run -d --name wasm-ctr \
+	--runtime=io.containerd.spin.v2 \
+	--platform=wasi/wasm \
+	-p 5556:80 \
+	nigelpoulton/ddd-book:wasm /
+```
+Connect your browser to http://localhost:5556/hello to see the app.
+
+### Clean up
+```
+$ docker rm wasm-ctr -f
+wasm-ctr
+
+$ docker rmi nigelpoulton/ddd-book:wasm
+Untagged: nigelpoulton/ddd-book:wasm
+Deleted: sha256:7b55889f1006285ed6c394dcc7a56aca8955c107587b2216
+```
+
+
+# Chapter 11: Docker Swarm
+### [top](#table-of-contents)
+
+This chapter is `skipped` as I'm not interested in Docker Compose. It's not popular as k8s.
+
+
+
+# Chapter 12: Deploying apps to Swarm
+### [top](#table-of-contents)
+
+This chapter is `skipped` as I'm not interested in Docker Compose. It's not popular as k8s.
+
+
+
+# Chapter 13: Docker Networking
+### [top](#table-of-contents)
+
+### Docker networking – the TLDR
+> Docker networking is based on libnetwork, which is the reference implementation of an open-source architecture called the Container Network Model (CNM).
+The model is pluggable, and the ecosystem can extend Docker’s networking capabilities via drivers that plug into libnetwork.
+Last but not least, libnetwork also provides native service discovery and basic load balancing.
+
+### Docker networking theory
+At the highest level, Docker networking is based on the following three components:
+- The Container Network Model (CNM)
+- Libnetwork
+- Drivers
+
+The CNM is the design specification and outlines the fundamental building blocks of a Docker network.
+Libnetwork is a real-world implementation of the CNM. It’s opensourced as part of the Moby project (https://mobyproject.org) and used by Docker and other platforms.
+Drivers extend the model by implementing specific network topologies such as VXLAN overlay networks.
+
+The CNM specification defines three building blocks: Sandboxes, Endpoints, Networks
+https://github.com/moby/moby/blob/master/libnetwork/docs/design.md
+
+Docker ships with several built-in drivers that we sometimes call native drivers or local drivers.
+These include bridge, overlay, and macvlan, and they build the most common network topologies.
+
+• Single-host bridge networks
+- Single-host tells us the network only spans a single Docker host
+- Bridge tells us that it’s an implementation of an 802.1d bridge (layer 2 switch)
+```
+$ docker network ls
+$ docker network inspect bridge
+$ docker network inspect bridge | grep bridge.name
+$ brctl show
+$ ip link show docker0
+$ docker network create -d bridge localnet			<<-- create a new single-host bridge network called localnet 
+$ brctl show
+```
+
+### External access via port mappings
+```
+$ docker run -d --name web --network localnet --publish 5005:80 nginx
+$ docker port web									<<-- Verify the port mapping
+
+$ docker run -it --name client --network bridge alpine sh
+#
+# apk add curl
+# curl 192.168.64.69:5005
+```
+
+### Connecting to existing networks and VLANs
+The ability to connect containerized apps to external systems and physical networks is important.
+A common example is partially containerized apps where the parts running in containers need to be able to communicate with the parts not running in containers.
+
+The built-in MACVLAN driver (transparent if you’re using Windows containers) was created with this in mind.
+It gives every container its own IP and MAC address on the external physical network, making each one look, smell, and feel like a physical server or VM.
+
+When you create a new Docker network with the `macvlan` driver and configure it with all of the following:
+- Subnet info
+- Gateway
+- Range of IPs it can assign to containers
+- Which of the host’s interfaces or sub-interfaces to use
+
+Run the following command to create a new MACVLAN network called macvlan100 that will connect containers to your host network named VLAN 100.
+```
+$ docker network create -d macvlan \
+  --subnet=10.0.0.0/24 \
+  --ip-range=10.0.0.0/25 \
+  --gateway=10.0.0.1 \
+  -o parent=eth0.100 \        <<---- Make sure this matches your host ethernet config
+  macvlan100
+```
+Docker will create the `macvlan100` network and a new sub-interface on the host called `eth0.100@eth0`.
+
+```
+$ docker network inspect macvlan100
+[
+    {
+        "Name": "macvlan100",
+        "Driver": "macvlan",
+        "IPAM": {
+            "Config": [
+                {
+                    "Subnet": "10.0.0.0/24",
+                    "IPRange": "10.0.0.0/25",
+                    "Gateway": "10.0.0.1"
+                }
+            ]
+        },
+        "Options": {
+            "parent": "enp0s1.100"
+        },
+    }
+]
+```
+
+The following command creates a new container called `mactainer1` and connects it to the `macvlan100` network.
+```
+$ docker run -d --name mactainer1 \
+  --network macvlan100 \
+  alpine sleep 1d
+```
+
+### Troubleshooting connectivity problems
+
+#### Daemon logs and container logs can be useful when troubleshooting connectivity issues.
+- Windows containers
+  - view the events in the Windows Event Viewer, or
+  - check out logs at `~\AppData\Local\Docker`
+- Linux containers - it depends on which init system you’re using
+  - running a `systemd`
+    - Docker will post logs to journald and you can view them with the command `journalctl -u docker.service`
+  - running a different init system
+    - Ubuntu systems running  `upstart`
+      - `/var/log/upstart/docker.log`
+    - RHEL-based systems
+      - `/var/log/messages`
+    - Debian
+      - `/var/log/daemon.log`
+
+#### Set verbose logging for the daemons:
+- edit the docker daemon config file at `/etc/docker/daemon.json`
+  - set `debug` to `true`
+  - set `log-level` to one of the following
+    - `debug` – the most verbose option
+    - `info` – the default value and second-most verbose option
+    - `warn` – third most verbose option
+    - `error` – fourth most verbose option
+    - `fatal` – least verbose option
+- be sure to restart Docker after making any changes to the file
+
+#### For container logs
+- view the logs with the command `docker logs`
+- If you’re running `Swarm`: use the command `docker service logs`
+
+
+### Service Discovery
+Example:  a container `c1` pings another container `c2` by name.
+- Step 1
+  - The `c1` container issues a `ping c2` command. The container’s local DNS resolver checks its cache to see if it has an IP address for `c2`. All Docker containers have a local DNS resolver.
+- Step 2
+  - The local resolver doesn’t have an IP address for `c2`, so it initiates a recursive query to the embedded Docker DNS server.
+  - All Docker containers are pre-configured to know how to send queries to the embedded DNS server.
+- Step 3
+  - The Docker DNS server maintains name-to-IP mappings for every container you create with the `--name` or `--net-alias` flags. This means it knows the IP address of the `c2`
+container.
+- Step 4
+  - The DNS server returns the IP address of the `c2` container to the local resolver in the `c1` container.
+  - If `c1` and `c2` are on different Docker networks it won’t return the IP address — name resolution only works for containers on the same network.
+- Step 5
+  - The `c1` container sends the ping request (**ICMP** echo request) to the IP address of `c2`.
+```
+$ docker run -it --name custom-dns \
+  --dns=8.8.8.8 \
+  --dns-search=nigelpoulton.com \
+  alpine sh
+```
+
+### Ingress load balancing
+This section only applies to Docker Swarm.
+
+Swarm supports two ways of publishing services to external clients:
+- Ingress mode (default)
+- Host mode
+
+```
+$ docker service create -d --name svc1 \
+  --publish published=5005,target=80,mode=host \
+  nginx
+
+...
+
+# cleanup
+$ docker service rm svc1
+$ docker rm c1 c2 client web mactainer1 -f
+$ docker network rm localnet macvlan100
+```
+
+
+
+# Chapter 14: Docker overlay networking
+### [top](#table-of-contents)
+
+### Docker overlay networking – The TLDR
+Docker offers native overlay networking that is simple to configure and secure by default.
+
+Behind the scenes, Docker builds overlay networking on top of `libnetwork` and the native overlay driver.
+`Libnetwork` is the canonical implementation of the Container Network Model (CNM), and the `overlay` driver implements all of the machinery to build overlay networks.
+
+
+### Docker overlay networking history
+In March 2015, Docker , Inc. acquired a container networking startup `Socket Plane` with two goals in mind:
+1. Bring overlay networking to Docker
+2. Make container networking simple for developers
+
+### Building and testing overlay networks
+- build a two-node swarm with two Docker nodes called `node1` and `node2`
+  - ensure the following network ports are open between the two nodes
+    - 2377/tcp for management plane comms
+    - 7946/tcp and 7946/udp for control plane comms (SWIM-based gossip)
+    - 4789/udp for the VXLAN data plane
+- Run the following command on node1
+```
+$ docker swarm init
+$ docker swarm join \
+  --token SWMTKN-1-0hz2ec...2vye \
+  172.31.1.5:2377
+```
+  - You now have a two-node Swarm with `node1` as a manager and `node2` as a worker.
+
+### Overlay networks explained
+
+At the highest level, Docker uses VXLANs to create layer 2 networks on top of existing layer 3 infrastructure.
+
+Each end of the VXLAN tunnel is terminated by a VXLAN Tunnel Endpoint (VTEP), and it’s this VTEP that encapsulates and de-encapsulates the traffic entering and exiting the tunnel.
+
+
+
+# Chapter 15: Volumes and persistent data
+### [top](#table-of-contents)
+
+### Volumes and persistent data – The TLDR
+
+There are two main types of data — `persistent` and `non-persistent`.
+
+> For stateless apps, Docker creates every container with an area of non-persistent local storage that’s tied to the container lifecycle.
+This storage is suitable for scratch data and temporary files, but you’ll lose it when you delete the container or the container terminates.
+
+> Docker has volumes for stateful apps that create and manage important data.
+Volumes are separate objects that you mount into containers, and they have their own lifecycles.
+You don’t lose the volumes or the data on them when you delete containers. You can even mount volumes into different containers.
+
+
+### Containers without volumes
+
+Docker keeps the local storage layer on the Docker host’s filesystem. Typical location:
+- Linux containers:  `/var/lib/docker/<storage-driver>/...`
+- Windows containers: `C:\ProgramData\Docker\windowsfilter\...`
+
+There are three main reasons you should use volumes to handle persistent data in containers:
+- Volumes are independent objects that are not tied to the lifecycle of a container
+- You can map volumes to specialized external storage systems
+- Multiple containers on different Docker hosts can use volumes to access and share the same data
+
+By default, Docker creates new volumes with the built-in `local` driver.
+```
+$ docker volume create myvol
+myvol
+
+$ docker volume ls
+DRIVER              VOLUME NAME
+local               myvol
+
+$ docker volume inspect myvol
+```
+
+- You can use the `-d` flag to specify a different driver, but you’ll need to install the driver first.
+- Notice that the `Driver` and `Scope` fields are both set to `local`.
+  - This means you created the volume with the `local` driver, and it’s only available to containers on this Docker host.
+  - `Mountpoint` tells you where the volume exists in the Docker host’s filesystem.
+- By default, Docker gives every volume created with the `local` driver its own directory on the host under `/var/lib/docker/volumes`
+- Two ways to delete Docker volumes
+```
+docker volume prune
+
+docker volume rm
+```
+
+The `docker volume prune --all` command deletes all volumes not mounted into a container or service replica, so use it with caution!
+
+The `docker volume rm` command is more precise and lets you specify which volumes to delete.
+
+Neither command will delete a volume in use by a container or service replica.
+
+Sample command to create a new standalone container called `voltainer` that mounts a volume called `bizvol`.
+```
+$ docker run -it --name voltainer \
+    --mount source=bizvol,target=/vol \
+    alpine
+```
+
+- If you specify a volume that already exists, Docker will use it.
+- If you specify a volume that does not exist, Docker will create it.
+
+```
+$ ls -l /var/lib/docker/volumes/bizvol/_data/
+total 4
+-rw-r--r-- 1 root root 50 Jan 12 14:25 file1
+
+$ cat /var/lib/docker/volumes/bizvol/_data/file1
+I promise to write a book review on Amazon
+```
+
+
+
+# Chapter 16: Docker security
+### [top](#table-of-contents)
+
+### Docker security – The TLDR
+Docker also has its own security technologies, including Docker Scout and Docker Content Trust.
+- Docker Scout offers class-leading vulnerability scanning that scans your images, provides detailed reports on known vulnerabilities, and recommends solutions.
+- Docker Content Trust (DCT) lets you cryptographically sign and verify images.
+
+If you use Docker Swarm, you’ll also get all of the following that Docker automatically configures:
+- cryptographic node IDs
+- mutual authentication (TLS)
+- automatic CA configuration and certificate rotation
+- secure cluster join tokens
+- an encrypted cluster store
+- encrypted networks
+- etc.
+
+
+### Linux security technologies
+
+#### Kernel namespaces
+A quick comparison between namespaces and containers with hypervisors and virtual machines (VM).
+- Namespaces virtualize operating system constructs such as process trees and filesystems
+- Hypervisors virtualize physical resources such as CPUs and disks. In the VM model, hypervisors create virtual machines by grouping virtual CPUs, virtual disks, and virtual network cards so that every VM looks, smells, and feels like a physical machine. 
+- In the container model, namespaces create virtual operating systems (containers) by grouping virtual process trees, virtual filesystems, and virtual network interfaces so that every container looks, smells, and feels exactly like a regular OS.
+- At a very high level, namespaces provide lightweight isolation but do not provide a strong security boundary.
+- Compared with VMs, containers are more efficient, but virtual machines are more secure.
+
+Every Docker container gets its own instance of the following namespaces:
+- Process ID (pid)
+- Network (net)
+- Filesystem/mount (mnt)
+- Inter-process Communication (ipc)
+- User (user)
+- UTS (uts)
+
+How Docker uses each namespace:
+- Process ID namespace
+  - Docker uses the pid namespace to give each container its own isolated process tree. This means every container gets its own PID 1 and cannot see or access processes running in other containers. Nor can any container see or access processes running on the host.
+- Network namespace
+  - Docker uses the net namespace to provide each container with an isolated network stack. This stack includes interfaces, IP addresses, port ranges, and routing tables.
+  - For example, every container gets its own `eth0` interface with its own unique IP and range of ports.
+- Mount namespace
+  - Every container has its own `mnt` namespace with its own unique isolated root (`/`) filesystem. This means every container can have its own `/etc`, `/var`, `/dev` and other important filesystem constructs. Processes inside a container cannot access the host’s filesystem or filesystems in other containers.
+- Inter-process Communication namespace
+  - Docker uses the ipc namespace for shared memory access within a container. It also isolates the container from shared memory on the host and other containers.
+- User namespace
+  - Docker gives each container its own users that are only valid inside the container . It also lets you map those users to different users on the Docker host.
+  - For example, you can map a container’s root user to a non-root user on the host.
+- UTS namespace
+  - Docker uses the uts namespace to provide each container with its own hostname.
+
+
+#### Control Groups
+If `namespaces` are about **isolation**, `control groups` (`cgroups`) are about **limits**.
+
+Docker uses `cgroups` to limit a container’s use of these shared resources and prevent any container from consuming them all and causing a denial of service (DoS) attack.
+
+#### Capabilities
+Under the hood, the Linux root user is a combination of a long list of capabilities. Some of these capabilities include:
+- CAP_CHOWN: lets you change file ownership
+- CAP_NET_BIND_SERVICE: lets you bind a socket to low-numbered network ports
+- CAP_SETUID: lets you elevate the privilege level of a process
+- CAP_SYS_BOOT: lets you reboot the system.
+
+Docker leverages capabilities so that you can run containers as `root` but strip out all the capabilities you don’t need.
+
+#### Mandatory Access Control
+Docker works with major Linux MAC technologies such as `AppArmor` and `SELinux`.
+
+#### seccomp
+Docker uses `seccomp` to limit which syscalls a container can make to the host’s kernel.
+- Syscalls are how applications ask the Linux kernel to perform tasks.
+- Linux has over 300 syscalls and the default Docker profile disables approximately 40-50.
+
+### Docker security technologies
+
+#### Swarm security
+- Docker Swarm lets you cluster multiple Docker hosts and manage applications declaratively.
+- Every Swarm comprises manager nodes and worker nodes that can be Linux or Windows.
+- Managers host the control plane and are responsible for configuring the cluster and dispatching work tasks.
+- Workers run application containers.
+
+
+#### Docker Scout and vulnerability scanning
+N/A
+
+#### Docker Content Trust
+N/A
+
+#### Docker secrets
+- 1. You create the secret
+- 2. Docker stores it in the encrypted cluster store
+- 3. You create a service (the dark containers) and grant it access to the secret
+- 4. Docker encrypts the secret when sending it over the network to service replicas
+- 5. Docker mounts the secret into service replicas as an unencrypted file in an in-memory filesystem
+
+
+### [top](#table-of-contents)
